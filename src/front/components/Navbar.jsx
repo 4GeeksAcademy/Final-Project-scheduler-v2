@@ -4,7 +4,7 @@ export const Navbar = () => {
 	return (
 		<nav className="navbar bg-body-tertiary fixed-top">
 			<div className="container-fluid">
-				<Link className="navbar-brand" to="/">My App</Link>
+				<Link className="navbar-brand" to="/">Time Tidy</Link>
 
 				<button
 					className="navbar-toggler"
@@ -34,7 +34,7 @@ export const Navbar = () => {
 								<Link className="nav-link active" to="/">Home</Link>
 							</li>
 							<li className="nav-item">
-								<Link className="nav-link" to="/about">About</Link>
+								<Link className="nav-link" to="/profile">Profile</Link>
 							</li>
 							<li className="nav-item dropdown">
 								<a
@@ -44,21 +44,20 @@ export const Navbar = () => {
 									data-bs-toggle="dropdown"
 									aria-expanded="false"
 								>
-									Options
+									Navigate
 								</a>
 								<ul className="dropdown-menu">
-									<li><Link className="dropdown-item" to="/action">Action</Link></li>
-									<li><Link className="dropdown-item" to="/another">Another action</Link></li>
-									<li><hr className="dropdown-divider" /></li>
-									<li><Link className="dropdown-item" to="/something-else">Something else</Link></li>
+									<li><Link className="dropdown-item" to="/goals">Goals</Link></li>
+									<li><Link className="dropdown-item" to="/calendar">Calendar</Link></li>
+									<li><Link className="dropdown-item" to="/friends">Friends</Link></li>
+									<li>
+										<hr className="dropdown-divider" />
+									</li>
+									<li><Link className="dropdown-item" to="/settings">Settings</Link></li>
+									<li><Link className="dropdown-item" to="/support">Support</Link></li>
 								</ul>
 							</li>
 						</ul>
-
-						<form className="d-flex mt-3" role="search">
-							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-							<button className="btn btn-outline-success" type="submit">Search</button>
-						</form>
 					</div>
 				</div>
 			</div>
