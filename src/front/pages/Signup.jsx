@@ -1,0 +1,93 @@
+import useGlobalReducer from "../hooks/useGlobalReducer";
+// import { Link } from "react-router-dom";
+
+export const Signup = () => {
+  const { store, dispatch } = useGlobalReducer();
+
+  return (
+    <div className="d-flex align-items-center justify-content-center vh-100" style={{ background: "#f4f6f8" }}>
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-12" style={{ maxWidth: "40rem" }}>
+            <div
+              className="card shadow-lg border-0"
+              style={{ borderRadius: "1rem", overflow: "hidden" }}
+            >
+
+              <div className="card-header bg-white text-center py-4 border-0">
+                <h1 className="card-title fw-bold text-primary mb-1">Sign Up</h1>
+                <p className="card-text text-muted mb-0">
+                  Create your account to get started
+                </p>
+              </div>
+
+              <div className="card-body p-4 p-md-5 bg-white">
+                <form>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">First Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter your first name"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Last Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter your last name"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Email address</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Password</label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+
+                  <div className="d-grid">
+                    <button
+                      type="submit"
+                      className="btn btn-primary btn-lg fw-semibold"
+                      style={{
+                        borderRadius: "50px",
+                        transition: "0.3s ease-in-out",
+                      }}
+                      onMouseOver={(e) => (e.target.style.opacity = "0.9")}
+                      onMouseOut={(e) => (e.target.style.opacity = "1")}
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div className="card-footer bg-light border-0 text-center py-3">
+                <span className="text-muted">Already have an account?</span>
+                <a href="/login" className="btn btn-outline-primary btn-sm ms-2 rounded-pill">
+                  Sign in
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
