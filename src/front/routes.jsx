@@ -9,7 +9,11 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
+<<<<<<< HEAD
 import { CreateEvent } from "./pages/CreateEvent";
+=======
+import Login from "./pages/Login.jsx";
+>>>>>>> 7646402e41497af4ce1769cf7ceb5adab8a0b3cb
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -22,7 +26,11 @@ export const router = createBrowserRouter(
       // Root Route: All navigation will start from here.
       <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
 
+        <Route index element={<Login />} /> 
+
         {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
+        
+
         <Route path= "/" element={<Home />} />
         <Route path="/single/:theId" element={ <Single />} />  {/* Dynamic route for single items */}
         <Route path="/demo" element={<Demo />} />
