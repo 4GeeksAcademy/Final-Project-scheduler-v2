@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import profilePhoto from "../assets/img/profile-photo.jpg";
 
-const getCurrentWeek = () => {
+const getCurrentWeek = (weekOffset = 0) => {
     const today = new Date();
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday as first day
+    startOfWeek.setDate(today.getDate() - today.getDay() + weekOffset * 7); // Sunday as first day
     const week = [];
     for (let i = 0; i < 7; i++) {
         const day = new Date(startOfWeek);
@@ -20,6 +20,7 @@ const ProfilePage = () => {
     const [holidays, setHolidays] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [weekOffset, setWeekOffset] = useState(0); // 0 = current week
 
     useEffect(() => {
         const fetchHolidays = async () => {
@@ -39,16 +40,15 @@ const ProfilePage = () => {
                 setError("Failed to fetch holidays");
             } finally {
                 setLoading(false);
-            };
-
+            }
         };
 
         fetchHolidays();
     }, []);
 
-    const week = getCurrentWeek();
+    const week = getCurrentWeek(weekOffset);
 
-    // Map holidays to ISO date strings for quick lookup
+
     const holidaysByDate = {};
     holidays.forEach(holiday => {
         holidaysByDate[holiday.date.iso] = holidaysByDate[holiday.date.iso] || [];
@@ -62,7 +62,7 @@ const ProfilePage = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 minHeight: "100vh",
-                paddingTop: "80px" // <-- Add this line (adjust value to match your navbar height)
+                paddingTop: "80px"
             }}
         >
             {/* Row with profile and progress boxes */}
@@ -206,6 +206,13 @@ const ProfilePage = () => {
             {/* Week at a Glance */}
             <div style={{ width: "80vw", maxWidth: "900px", marginTop: "32px" }}>
                 <h2>Week at a Glance</h2>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
+                    <button onClick={() => setWeekOffset(weekOffset - 1)}>Previous</button>
+                    <span style={{ alignSelf: "center" }}>
+                        {week[0].toLocaleDateString()} - {week[6].toLocaleDateString()}
+                    </span>
+                    <button onClick={() => setWeekOffset(weekOffset + 1)}>Next</button>
+                </div>
                 <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                     {week.map(day => {
                         const iso = day.toISOString().split("T")[0];
@@ -217,7 +224,7 @@ const ProfilePage = () => {
                                     borderRadius: "8px",
                                     background: holidaysByDate[iso] ? "#e8f5e9" : "#fff",
                                     boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                                    flex: "1 1 calc(14.28% - 8px)", // 7 items in a row, adjust for gap
+                                    flex: "1 1 calc(14.28% - 8px)",
                                     display: "flex",
                                     flexDirection: "column",
                                     alignItems: "center",
@@ -226,7 +233,6 @@ const ProfilePage = () => {
                             >
                                 <div style={{ fontSize: "1.2rem", fontWeight: "500" }}>{day.getDate()}</div>
                                 <div style={{ fontSize: "0.9rem", color: "#666" }}>{day.toLocaleString("default", { weekday: "short" })}</div>
-                                {/* Display holidays for the day */}
                                 {holidaysByDate[iso] && (
                                     <div style={{ marginTop: "4px", fontSize: "0.8rem", color: "#2e7d32" }}>
                                         {holidaysByDate[iso].join(", ")}
@@ -240,7 +246,6 @@ const ProfilePage = () => {
         </div>
     );
 };
-
 
 export default ProfilePage;
 
