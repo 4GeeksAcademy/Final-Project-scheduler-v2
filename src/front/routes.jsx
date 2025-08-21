@@ -21,6 +21,7 @@ export const router = createBrowserRouter(
     // Note: The child paths of the Layout element replace the Outlet component with the elements contained in the "element" attribute of these child paths.
 
     // Root Route: All navigation will start from here.
+
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
 
       <Route index element={<Login />} />

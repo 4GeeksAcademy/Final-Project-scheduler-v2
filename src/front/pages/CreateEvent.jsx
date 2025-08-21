@@ -13,9 +13,10 @@ export const CreateEvent = () => {
         "visibility": null,
         "host": null,
         "repeat": null, //maybe have this look like an object?
+        "description": null,
         "goalAmount": null, // optional
         "timer": null //optional
-    }) // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
+    }); // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
 
     useEffect(() => {
 
@@ -33,9 +34,12 @@ export const CreateEvent = () => {
     }
 
     function sendEventData() {
+        //the following 4 lines needs a bit more details on how the data is gonna be stored
         //line about setting the repeat value in eventData to the repeatType State
         //line about setting the visibility value in eventData to the publicEvent State
         //line about setting the timer value in eventData to the timer State
+        //line about setting the description value in eventData to the description State
+        console.log(eventData);
         //fetch line doing a POST to database to creat event usign the eventData object
 
     }
@@ -75,6 +79,11 @@ export const CreateEvent = () => {
                         </div>
                         <div id="repeatHelp" class="form-text mb-3">How often you'll want this event to repeat.</div>
                         <form>
+                            <div className="mb-3 mt-2 form-check p-0">
+                                <label className="form-label text-light">Description:</label>
+                                <textarea className="form-control" rows="3" id="description" onChange={changeEventData}></textarea>
+                                <div class="form-text mb-3">Write details you want to note down about this event here.</div>
+                            </div>
                             {(repeatType == "No Repeat") ?
                                 (<span></span>) :
                                 (repeatType == "Date Specific") ?
@@ -91,7 +100,7 @@ export const CreateEvent = () => {
                                         </div>) : (<span></span>)}
                             <div className="mb-3">
                                 <label className="form-label text-light">Start Time:</label>
-                                <input type="time" className="form-control w-50" id="time" />
+                                <input type="time" className="form-control w-50" id="time" onChange={changeEventData} />
                             </div>
 
                             <div className="mb-3 mt-5 form-check">
@@ -132,45 +141,6 @@ export const CreateEvent = () => {
 
 
 /*
-
-
-imports
-
-
-function thatdoessomething{
-
-
-    lines containting useSTate/useContext declarations
-
-    useEffect lines goes here (sets up useSTates or other relevent varaiables for the page)
-
-
-    maybe  some code here
-
-
-
-
-
-
-
-    return (HTML stuff)
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
