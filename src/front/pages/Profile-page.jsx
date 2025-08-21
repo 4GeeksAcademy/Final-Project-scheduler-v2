@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import profilePhoto from "../assets/img/profile-photo.jpg";
+import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
 
 const getCurrentWeek = (weekOffset = 0) => {
     const today = new Date();
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay() + weekOffset * 7); // Sunday as first day
+    startOfWeek.setDate(today.getDate() - today.getDay() + weekOffset * 7);
     const week = [];
     for (let i = 0; i < 7; i++) {
         const day = new Date(startOfWeek);
@@ -17,10 +17,31 @@ const getCurrentWeek = (weekOffset = 0) => {
 
 const ProfilePage = () => {
     const { userId } = useParams();
+
+
+    const [name, setName] = useState("Saul");
+    const [number, setNumber] = useState("555-123-4567");
+    const [email, setEmail] = useState("saul@email.com");
+    const [profilePhoto, setProfilePhoto] = useState(defaultProfilePhoto);
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState(name);
+    const [editNumber, setEditNumber] = useState(number);
+    const [editEmail, setEditEmail] = useState(email);
+    const [editPhoto, setEditPhoto] = useState(profilePhoto);
+
     const [holidays, setHolidays] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [weekOffset, setWeekOffset] = useState(0); // 0 = current week
+    const [year, setYear] = useState(new Date().getFullYear());
+
+    const week = getCurrentWeek(weekOffset);
+
+    useEffect(() => {
+        const newYear = week[0].getFullYear();
+        if (newYear !== year) setYear(newYear);
+    }, [weekOffset]);
 
     useEffect(() => {
         const fetchHolidays = async () => {
@@ -28,7 +49,6 @@ const ProfilePage = () => {
             setError(null);
             const apiKey = "gAwykI0JDFTe6Iw0HyvdaNmiYooQrPAb";
             const country = "US";
-            const year = new Date().getFullYear();
 
             try {
                 const response = await fetch(
@@ -44,16 +64,40 @@ const ProfilePage = () => {
         };
 
         fetchHolidays();
-    }, []);
-
-    const week = getCurrentWeek(weekOffset);
-
+    }, [year]);
 
     const holidaysByDate = {};
     holidays.forEach(holiday => {
         holidaysByDate[holiday.date.iso] = holidaysByDate[holiday.date.iso] || [];
         holidaysByDate[holiday.date.iso].push(holiday.name);
     });
+
+    const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditPhoto(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSave = () => {
+        setName(editName);
+        setNumber(editNumber);
+        setEmail(editEmail);
+        setProfilePhoto(editPhoto);
+        setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+        setEditName(name);
+        setEditNumber(number);
+        setEditEmail(email);
+        setEditPhoto(profilePhoto);
+        setIsEditing(false);
+    };
 
     return (
         <div
@@ -68,12 +112,22 @@ const ProfilePage = () => {
             {/* Row with profile and progress boxes */}
             <div style={{ display: "flex", flexDirection: "row", gap: "32px", width: "100%", justifyContent: "center" }}>
                 {/* profile box */}
+                <div>
+                    {!isEditing ? (
+                        <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+                    ) : (
+                        <>
+                            <button onClick={handleSave} style={{ marginRight: "8px" }}>Save</button>
+                            <button onClick={handleCancel}>Cancel</button>
+                        </>
+                    )}
+                </div>
                 <div
                     style={{
                         width: "50vw",
                         minHeight: "250px",
                         display: "flex",
-                        flexDirection: "column", // stack heading, photo, and info vertically
+                        flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "flex-start",
                         background: "#f5f5f5",
@@ -84,7 +138,16 @@ const ProfilePage = () => {
                     }}
                 >
                     {/* Heading above photo */}
-                    <h1 style={{ marginBottom: "24px" }}>Saul's Page</h1>
+                    {!isEditing ? (
+                        <h1 style={{ marginBottom: "24px" }}>{name}'s Page</h1>
+                    ) : (
+                        <input
+                            type="text"
+                            value={editName}
+                            onChange={e => setEditName(e.target.value)}
+                            style={{ marginBottom: "24px", fontSize: "2rem", textAlign: "center" }}
+                        />
+                    )}
                     {/* Circular photo placeholder - larger size */}
                     <div
                         style={{
@@ -102,7 +165,7 @@ const ProfilePage = () => {
                         }}
                     >
                         <img
-                            src={profilePhoto}
+                            src={isEditing ? editPhoto : profilePhoto}
                             alt="Profile"
                             style={{
                                 width: "100%",
@@ -112,9 +175,42 @@ const ProfilePage = () => {
                             }}
                         />
                     </div>
+                    {isEditing && (
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePhotoChange}
+                            style={{ marginBottom: "16px" }}
+                        />
+                    )}
                     {/* Profile info section */}
                     <div>
-                        {/* Add more profile info here if needed */}
+                        <p>
+                            Number:{" "}
+                            {!isEditing ? (
+                                number
+                            ) : (
+                                <input
+                                    type="text"
+                                    value={editNumber}
+                                    onChange={e => setEditNumber(e.target.value)}
+                                    style={{ fontSize: "1rem", width: "100px" }}
+                                />
+                            )}
+                        </p>
+                        <p>
+                            Email:{" "}
+                            {!isEditing ? (
+                                email
+                            ) : (
+                                <input
+                                    type="email"
+                                    value={editEmail}
+                                    onChange={e => setEditEmail(e.target.value)}
+                                    style={{ fontSize: "1rem", width: "200px" }}
+                                />
+                            )}
+                        </p>
                     </div>
                 </div>
                 {/* profile box */}
@@ -206,12 +302,13 @@ const ProfilePage = () => {
             {/* Week at a Glance */}
             <div style={{ width: "80vw", maxWidth: "900px", marginTop: "32px" }}>
                 <h2>Week at a Glance</h2>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", alignItems: "center" }}>
                     <button onClick={() => setWeekOffset(weekOffset - 1)}>Previous</button>
-                    <span style={{ alignSelf: "center" }}>
+                    <button onClick={() => setWeekOffset(0)} style={{ margin: "0 12px" }}>Current Week</button>
+                    <button onClick={() => setWeekOffset(weekOffset + 1)}>Next</button>
+                    <span style={{ alignSelf: "center", marginLeft: "16px" }}>
                         {week[0].toLocaleDateString()} - {week[6].toLocaleDateString()}
                     </span>
-                    <button onClick={() => setWeekOffset(weekOffset + 1)}>Next</button>
                 </div>
                 <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                     {week.map(day => {
