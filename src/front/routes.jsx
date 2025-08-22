@@ -10,6 +10,7 @@ import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import { CreateEvent } from "./pages/CreateEvent";
+import { TestingPage } from "./pages/TestingPage";
 import Login from "./pages/Login.jsx";
 
 export const router = createBrowserRouter(
@@ -33,6 +34,7 @@ export const router = createBrowserRouter(
       <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}
       <Route path="/demo" element={<Demo />} />
       <Route path="/create/event" element={<CreateEvent />} />
+      <Route path="/test" element={<TestingPage />} />
     </Route>
   )
 );
