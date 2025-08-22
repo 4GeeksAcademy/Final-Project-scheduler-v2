@@ -36,3 +36,18 @@ def post_event_route():
     # db.session.commit()
 
     return jsonify("ok"), 200
+
+
+@api.route('/editEvent', methods=['PUT'])
+def post_event_route():
+
+    # do updating in the database
+    request_data = request.json
+    event_id = request_data["id"]
+    event = Events.query.get(event_id)
+    event.date = request_data["date"]
+    # do all the other event fields
+
+    # db.session.commit()
+
+    return jsonify("ok"), 200
