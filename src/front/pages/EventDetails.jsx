@@ -1,3 +1,7 @@
+import React, { useEffect, useState } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer";
+import { useParams } from "react-router-dom";
+
 export default function EventDetails() {
     const { store, dispatch } = useGlobalReducer();
     const mockEvent = {
