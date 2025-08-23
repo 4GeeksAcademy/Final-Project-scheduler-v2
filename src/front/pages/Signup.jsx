@@ -1,24 +1,74 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Signup = () => {
-  const [form, setForm] = useState({
-    username: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    gender: "",
-  });
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [gender, setGender] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((s) => ({ ...s, [name]: value }));
-  };
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  // just keep the string, don’t try to trim or sanitize automatically
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+  function handleSubmit(e) {
     e.preventDefault();
-    console.log("Form submitted:", form);
-  };
+
+    if (!backendUrl) {
+      setErrorMsg("Backend URL is missing in your .env file");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    const apiUrl = backendUrl + "/api/signup";
+
+    const bodyData = {
+      username: username,
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      password: password,
+      gender: gender
+    };
+
+    fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyData)
+    })
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then((result) => {
+        if (!result.ok) {
+          setErrorMsg(result.data.error || "Signup failed");
+        } else {
+          setSuccessMsg("Account created! Redirecting to login…");
+          setUsername("");
+          setFirstName("");
+          setLastName("");
+          setEmail("");
+          setPassword("");
+          setGender("");
+          setTimeout(() => {
+            navigate("/Login");
+          }, 1500);
+        }
+      })
+      .catch((err) => {
+        setErrorMsg("Could not reach the server: " + err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
 
   return (
     <div
@@ -26,8 +76,8 @@ export const Signup = () => {
       style={{
         background: "#f4f6f8",
         padding: "2rem 1rem",
-        marginTop: "56px", 
-        minHeight: "100vh"
+        marginTop: "56px",
+        minHeight: "100vh",
       }}
     >
       <div
@@ -47,6 +97,13 @@ export const Signup = () => {
         </div>
 
         <div className="card-body p-4 p-md-5 bg-white">
+          {errorMsg !== "" && (
+            <div className="alert alert-danger mb-3">{errorMsg}</div>
+          )}
+          {successMsg !== "" && (
+            <div className="alert alert-success mb-3">{successMsg}</div>
+          )}
+
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="username" className="form-label fw-semibold">
@@ -54,13 +111,11 @@ export const Signup = () => {
               </label>
               <input
                 id="username"
-                name="username"
                 type="text"
                 className="form-control rounded-pill"
                 placeholder="Enter your username"
-                value={form.username}
-                onChange={handleChange}
-                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
@@ -71,13 +126,11 @@ export const Signup = () => {
               </label>
               <input
                 id="firstName"
-                name="firstName"
                 type="text"
                 className="form-control rounded-pill"
                 placeholder="Enter your first name"
-                value={form.firstName}
-                onChange={handleChange}
-                autoComplete="given-name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
               />
             </div>
@@ -88,13 +141,11 @@ export const Signup = () => {
               </label>
               <input
                 id="lastName"
-                name="lastName"
                 type="text"
                 className="form-control rounded-pill"
                 placeholder="Enter your last name"
-                value={form.lastName}
-                onChange={handleChange}
-                autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 required
               />
             </div>
@@ -105,13 +156,11 @@ export const Signup = () => {
               </label>
               <input
                 id="email"
-                name="email"
                 type="email"
                 className="form-control rounded-pill"
                 placeholder="Enter your email"
-                value={form.email}
-                onChange={handleChange}
-                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -122,13 +171,11 @@ export const Signup = () => {
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
                 className="form-control rounded-pill"
                 placeholder="Enter your password"
-                value={form.password}
-                onChange={handleChange}
-                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
@@ -139,10 +186,9 @@ export const Signup = () => {
               </label>
               <select
                 id="gender"
-                name="gender"
                 className="form-select rounded-pill"
-                value={form.gender}
-                onChange={handleChange}
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Select gender</option>
                 <option value="male">Male</option>
@@ -155,11 +201,9 @@ export const Signup = () => {
               <button
                 type="submit"
                 className="btn btn-primary btn-lg fw-semibold rounded-pill"
-                style={{ transition: "0.3s ease-in-out" }}
-                onMouseOver={(e) => (e.target.style.opacity = "0.9")}
-                onMouseOut={(e) => (e.target.style.opacity = "1")}
+                disabled={loading}
               >
-                Sign Up
+                {loading ? "Signing up..." : "Sign Up"}
               </button>
             </div>
           </form>
@@ -167,17 +211,16 @@ export const Signup = () => {
 
         <div className="card-footer bg-light border-0 text-center py-3">
           <span className="text-muted">Already have an account?</span>
-          <a
-            href="/login"
+          <Link
+            to="/Login"
             className="btn btn-outline-primary btn-sm ms-2 rounded-pill"
           >
             Sign in
-          </a>
+          </Link>
         </div>
       </div>
     </div>
   );
 };
-
 
 
