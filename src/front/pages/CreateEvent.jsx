@@ -7,15 +7,16 @@ export const CreateEvent = () => {
     const [timer, setTimer] = useState(false);
     const [eventData, setEventData] = useState({
         "date": null,
+        "name": null,
         "time": null,
         "timezone": null,
         "attendees": null,
         "visibility": null,
         "host": null,
-        "repeat": null, //maybe have this look like an object?
+        "repeat": null, //maybe have this look like an object? thinking it'll look like
         "description": null,
-        "goalAmount": null, // optional
-        "timer": null //optional
+        "goalAmount": null, // optional thinking it'll look like {goal1:{amount:X,total:Y},goal2:{amount:X,total:Y}}
+        "timer": null //optional thinking it'll look like {hours:X,minutes:Y,seconds:Z}
     }); // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
 
     useEffect(() => {
@@ -57,6 +58,10 @@ export const CreateEvent = () => {
                 <div className="row d-flex justify-content-center">
                     <div className="col-4">
                         <h1 className="text-light">Create Event:</h1>
+                        <div className="mb-3">
+                            <label className="form-label text-light">Event Name:</label>
+                            <input type="text" className="form-control w-50" id="name" onChange={changeEventData} />
+                        </div>
                         <div className="dropdown">
                             <button className="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-describedby="publicHelp">
                                 {(publicEvent) ? "Public" : "Private"}

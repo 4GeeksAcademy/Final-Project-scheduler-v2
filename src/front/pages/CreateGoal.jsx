@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { CreateEvent } from "./CreateEvent";
 
-export const TestingPage = () => {
+export const CreateGoal = () => {
 
     const [publicEvent, setPublicEvent] = useState(false);
+    const [eventList, setEventList] = useState([]);
     const [goalData, setGoalData] = useState({
         "user": null,
         "public": null,
@@ -12,9 +14,9 @@ export const TestingPage = () => {
 
     useEffect(() => {
 
-    }, [])
+    }, [eventList])
 
-    function changeEventData(e) {
+    function changeGoalData(e) {
         setGoalData({
             ...FormData,
             [e.target.name]: e.target.value,
@@ -27,7 +29,12 @@ export const TestingPage = () => {
 
     }
 
-
+    function updateEventList() {
+        //fetch line getting events from server
+    }
+    let listOfEvents = eventList.map((ev, index) => (
+        <li key={index}><button className="dropdown-item" type="button">{ev.name}</button></li>
+    ));
 
     return (
         <div className="container-fluid bg-success my-5">
@@ -61,45 +68,33 @@ export const TestingPage = () => {
 
                             <div className="mb-3 mt-2 form-check p-0">
                                 <label className="form-label text-light">Description:</label>
-                                <textarea className="form-control" rows="3" id="description" onChange={changeEventData}></textarea>
+                                <textarea className="form-control" rows="3" id="description" onChange={changeGoalData}></textarea>
                                 <div class="form-text mb-3">Write details you want to note down about this goal here.</div>
                             </div>
-
-                            <div className="btn-group">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Dropdown
-                                </button>
-                                <ul className="dropdown-menu">
-                                    <form className="px-4 py-3">
-                                        <div className="mb-3">
-                                            <label for="exampleDropdownFormEmail1" className="form-label">Email address</label>
-                                            <input type="email" className="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com" />
-                                        </div>
-                                        <div className="mb-3">
-                                            <label for="exampleDropdownFormPassword1" className="form-label">Password</label>
-                                            <input type="password" className="form-control" id="exampleDropdownFormPassword1" placeholder="Password" />
-                                        </div>
-                                        <div className="mb-3">
-                                            <div className="form-check">
-                                                <input type="checkbox" className="form-check-input" id="dropdownCheck" />
-                                                <label className="form-check-label" for="dropdownCheck">
-                                                    Remember me
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <button type="submit" className="btn btn-primary">Sign in</button>
-                                    </form>
-                                    <div className="dropdown-divider"></div>
-                                    <a className="dropdown-item" href="#">New around here? Sign up</a>
-                                    <a className="dropdown-item" href="#">Forgot password?</a>
-                                </ul>
-                            </div>
                         </form>
-                        <button onClick={() => sendEventData()} className="btn btn-primary">Submit</button>
+                        <div className="btn-group">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
+                                Add events
+                            </button>
+                            <ul className="dropdown-menu">
+
+                            </ul>
+                        </div>
+
+                        <div className="btn-group">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false" onClick={() => updateEventList()}>
+                                Create event
+                            </button>
+                            <ul className="dropdown-menu overflow-auto" style={{ width: "700px", height: "500px" }}>
+                                <CreateEvent />
+                            </ul>
+                        </div>
+
+                        <button onClick={() => sendGoalData()} className="btn btn-primary">Submit</button>
 
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };

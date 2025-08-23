@@ -10,7 +10,7 @@ import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import { CreateEvent } from "./pages/CreateEvent";
-import { TestingPage } from "./pages/TestingPage";
+import { CreateGoal } from "./pages/CreateGoal.jsx";
 import ProfilePage from "./pages/Profile-page";
 import Login from "./pages/Login.jsx";
 
@@ -31,7 +31,8 @@ export const router = createBrowserRouter(
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
-      <Route path="/test" element={<TestingPage />} />
+      <Route path="/create/event" element={<CreateEvent />} />
+      <Route path="/create/goal" element={<CreateGoal />} />
     </Route >
 
   )
