@@ -14,7 +14,6 @@ export const Signup = () => {
 
   const navigate = useNavigate();
 
-  // just keep the string, don’t try to trim or sanitize automatically
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   function handleSubmit(e) {
@@ -22,6 +21,12 @@ export const Signup = () => {
 
     if (!backendUrl) {
       setErrorMsg("Backend URL is missing in your .env file");
+      return;
+    }
+
+    // ✅ Custom check for gender
+    if (gender === "") {
+      setErrorMsg("Please select a gender");
       return;
     }
 
@@ -37,13 +42,13 @@ export const Signup = () => {
       last_name: lastName,
       email: email,
       password: password,
-      gender: gender
+      gender: gender,
     };
 
     fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bodyData)
+      body: JSON.stringify(bodyData),
     })
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
       .then((result) => {
