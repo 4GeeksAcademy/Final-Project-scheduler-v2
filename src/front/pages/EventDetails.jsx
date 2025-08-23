@@ -19,7 +19,7 @@ export default function EventDetails() {
     }
 
     return (
-        <div className="p-4 max-w-lg mx-auto border rounded-lg shadow-md">
+       <div className="pt-200 px-200 pb-4 max-w-lg mx-auto border rounded-lg shadow-md"style={{marginTop: "80px"}}>
             <h1 className="text-2xl font-bold">{mockEvent.title}</h1>
             <p className="text-sm text-gray-500">Hosted by {mockEvent.host}</p>
 
