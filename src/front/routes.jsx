@@ -1,5 +1,4 @@
-// Import necessary components and functions from react-router-dom.
-
+// src/router.jsx
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -9,12 +8,15 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
+import { Signup } from "./pages/Signup";
+import { FavoritesList } from "./pages/FavoritesList";
 import ProfilePage from "./pages/Profile-page";
 import Login from "./pages/Login.jsx";
 import GoalTracker from "./pages/Goals-page.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
+
     // CreateRoutesFromElements function allows you to build route elements declaratively.
     // Create your routes here, if you want to keep the Navbar and Footer in all views, add your new routes inside the containing Route.
     // Root, on he contrary, create a sister Route, if you have doubts, try it!
@@ -23,15 +25,20 @@ export const router = createBrowserRouter(
 
     // Root Route: All navigation will start from here.
 
-    <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
-
-      <Route path="/" element={<Home />} />
-
+   
+    <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
+      {/* Root shows Login */}
       <Route index element={<Login />} />
+
+      {/* Pages */}
+      <Route path="/home" element={<Home />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/profile/:userId" element={<ProfilePage />} />
       <Route path="/goals" element={<GoalTracker />} />
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
+      <Route path="/favoritesList" element={<FavoritesList />} />
     </Route >
 
   )
