@@ -11,6 +11,7 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import ProfilePage from "./pages/Profile-page";
 import Login from "./pages/Login.jsx";
+import GoalTracker from "./pages/Goals-page.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,7 +26,9 @@ export const router = createBrowserRouter(
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
 
       <Route path="/" element={<Home />} />
+
       <Route index element={<Login />} />
+      <Route path="/goals" element={<GoalTracker />} />
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
