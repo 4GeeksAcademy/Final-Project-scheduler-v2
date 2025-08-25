@@ -45,10 +45,10 @@ const GoalTracker = () => {
                 {/* Title and description section. */}
                 <div className="text-center">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 tracking-tight mb-2">Weekly Goals</h1>
-                    <p className="text-gray-500 text-lg">Set a weekly target and track your progress!</p>
+                    <p className="text-gray-500 text-lg">Set a target and track your progress!</p>
                 </div>
 
-                {/* Input section for adding a new goal with a target. */}
+                
                 <div className="flex flex-col md:flex-row gap-4">
                     <input
                         type="text"
@@ -106,7 +106,7 @@ const GoalTracker = () => {
                                         </span>
                                     </div>
 
-                                    {/* Progress bar and buttons container */}
+                                    {/* Progress bar and buttons container - I'm crying */}
                                     <div className="flex items-center gap-3 mt-4 md:mt-0">
                                         <div className="w-40 bg-gray-200 rounded-full h-3">
                                             <div
