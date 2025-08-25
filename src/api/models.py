@@ -32,6 +32,7 @@ class Events(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(unique=False, nullable=False)
     date: Mapped[str] = mapped_column(unique=False, nullable=False)
+    #fix the equals to colon
     time = Mapped[str] = mapped_column(unique=False, nullable=False)
     timezone = Mapped[str] = mapped_column(unique=False, nullable=False)
     attendees = Mapped[str] = mapped_column(unique=False, nullable=False)
