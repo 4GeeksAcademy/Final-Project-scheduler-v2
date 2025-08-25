@@ -49,6 +49,9 @@ class Userdata(db.Model):
         backref='followers'
     )
 
+    def serialize_followed(self):
+        return {"followed": [userdata.serialize() for userdata in self.followed]}
+
     def serialize(self):
         return {
             "id": self.id,
@@ -57,5 +60,4 @@ class Userdata(db.Model):
             "last_name": self.last_name,
             "email": self.email,
             "gender": self.gender,
-            "followed": [userdata.username for userdata in self.followed]
         }
