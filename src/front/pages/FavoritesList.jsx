@@ -1,41 +1,62 @@
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_BACKEND_URL
 
 export const FavoritesList = () => {
 
-    
+
     const [favoritesList, setFavoritesList] = useState([
         {
-            "id":1,
+            "id": 1,
             "FirstName": "Bob",
             "LastName": "The Builder"
         },
         {
-            "id":2,
+            "id": 2,
             "FirstName": "Barney",
             "LastName": "The Purple Dinosaur"
         }
     ]); // making fake Favorites objects
+    const [loaded, setLoaded] = useState(false);
 
-    useEffect(() => {
+    useEffect(async () => {
         //insert some bs about aking a fetch call to the Database for a list of user's Favorites (probably a protected view)
+        // Retrieve token from localStorage
+        const token = localStorage.getItem('jwt-token');
+        const userdata = await fetch(`${API_URL}/protected/followed`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        setLoaded(true);
+        setFavoritesList(userdata.followed);
+
     }, [favoritesList])
 
-    function removeFriend(){
+    async function removeFriend(target_id) {
         // database fetch to remove friend
+        const userdata = await fetch(`${API_URL}/protected/followed/remove/${target_id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': 'Bearer ' + token
+            }
+        });
         alert("function works") // remove this when the actual fetch is made
     }
 
-    function searchFavorites(){
+    function searchFavorites() {
         // is placed here in case we do actually want to search through favorited users
     }
 
 
-    let listedFavorites = favoritesList.map((friend,index) => (
+    let listedFavorites = favoritesList.map((friend, index) => (
         <tr key={index}>
             <td>{`${friend["FirstName"]} ${friend["LastName"]}`}</td>
             <td><button>View Profile</button></td>
-            <td><button onClick={()=>removeFriend()}>Remove</button></td>
+            <td><button onClick={() => removeFriend(friend.id)}>Remove</button></td>
         </tr>));
 
     return (
