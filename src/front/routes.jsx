@@ -8,8 +8,9 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
-import { Signup } from "./pages/Signup";           
-import ProfilePage from "./pages/Profile-page";     
+import { Signup } from "./pages/Signup";
+import { FavoritesList } from "./pages/FavoritesList";
+import ProfilePage from "./pages/Profile-page";
 import Login from "./pages/Login.jsx";
 
 export const router = createBrowserRouter(
@@ -24,6 +25,9 @@ export const router = createBrowserRouter(
       <Route path="/profile/:userId" element={<ProfilePage />} />
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
-    </Route>
+      <Route path="/profile/:userId" element={<ProfilePage />} />
+      <Route path="/favoritesList" element={<FavoritesList />} />
+    </Route >
+
   )
 );
