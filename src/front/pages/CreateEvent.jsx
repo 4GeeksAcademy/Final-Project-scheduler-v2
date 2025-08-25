@@ -71,7 +71,7 @@ export const CreateEvent = () => {
                                 <li><button className="dropdown-item" onClick={() => setPublicEvent(False)}>Private</button></li>
                             </ul>
                         </div>
-                        <div id="publicHelp" class="form-text mb-3">Switches if this event can be seen by others.</div>
+                        <div id="publicHelp" className="form-text mb-3">Switches if this event can be seen by others.</div>
                         <div className="dropdown">
                             <button className="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-describedby="repeatHelp">
                                 {repeatType}
@@ -82,12 +82,12 @@ export const CreateEvent = () => {
                                 <li><button className="dropdown-item" onClick={() => setRepeatType("No Repeat")}>No Repeat</button></li>
                             </ul>
                         </div>
-                        <div id="repeatHelp" class="form-text mb-3">How often you'll want this event to repeat.</div>
+                        <div id="repeatHelp" className="form-text mb-3">How often you'll want this event to repeat.</div>
                         <form>
                             <div className="mb-3 mt-2 form-check p-0">
                                 <label className="form-label text-light">Description:</label>
                                 <textarea className="form-control" rows="3" id="description" onChange={changeEventData}></textarea>
-                                <div class="form-text mb-3">Write details you want to note down about this event here.</div>
+                                <div className="form-text mb-3">Write details you want to note down about this event here.</div>
                             </div>
                             {(repeatType == "No Repeat") ?
                                 (<span></span>) :
