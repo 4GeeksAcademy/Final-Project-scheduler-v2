@@ -1,6 +1,13 @@
 """
 API routes: users & auth
 """
+from flask import Blueprint, request, jsonify
+from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from sqlalchemy import select
+
 from .models import db, Userdata  # User is unused
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -70,8 +77,16 @@ def get_user(user_id: int):
         return jsonify({"error": "User not found"}), 404
     return jsonify(user.serialize()), 200
 
+  # reuse the same function you wrote for /signup
+
+
+@api.route("/users", methods=["POST"])
+def create_user():
+    return signup()
 
 # --- Sign up (create user) ---
+
+
 @api.route("/signup", methods=["POST"])
 def signup():
     data = request.get_json(silent=True) or {}
@@ -185,3 +200,28 @@ def delete_user(user_id: int):
     db.session.delete(user)
     db.session.commit()
     return jsonify({"message": "User deleted"}), 200  # or return '', 204
+
+
+@api.route('/protected/followed', methods=['GET'])
+@jwt_required()
+def get_user_protected_follows_route():
+    current_user_id = get_jwt_identity()
+    user = db.session.execute(select(Userdata).where(
+        Userdata.id == current_user_id)).scalar_one_or_none()
+    return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
+
+
+@api.route('/protected/followed/<str:action>/<int:target_id>', methods=['PUT'])
+@jwt_required()
+def put_user_protected_follows_route(action: str, target_id: int):
+    current_user_id = get_jwt_identity()
+    user = db.session.execute(select(Userdata).where(
+        Userdata.id == current_user_id)).scalar_one_or_none()
+    target = db.session.execute(select(Userdata).where(
+        Userdata.id == target_id)).scalar_one_or_none()
+    if action == "add":
+        user.followed.append(target)
+    elif action == "remove":
+        user.followed.remove(target)
+    db.session.commit()
+    return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
