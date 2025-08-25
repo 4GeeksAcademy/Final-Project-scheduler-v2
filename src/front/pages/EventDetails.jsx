@@ -8,6 +8,7 @@ export default function EventDetails() {
         id: 1,
         title: "Study Group Session",
         date: "8/22/25",
+        name: "Haley",
         time: "10am",
         timezone: "EST",
         attendees: ["Haley", "Connor", "Rudy"],
