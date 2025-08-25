@@ -33,6 +33,10 @@ def get_user(user_id: int):
         return jsonify({"error": "User not found"}), 404
     return jsonify(user.serialize()), 200
 
+  # reuse the same function you wrote for /signup
+@api.route("/users", methods=["POST"])
+def create_user():
+    return signup()
 
 # --- Sign up (create user) ---
 @api.route("/signup", methods=["POST"])
