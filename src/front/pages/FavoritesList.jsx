@@ -37,6 +37,7 @@ export const FavoritesList = () => {
 
     async function removeFriend(target_id) {
         // database fetch to remove friend
+        setLoaded(false);
         const userdata = await fetch(`${API_URL}/protected/followed/remove/${target_id}`, {
             method: "PUT",
             headers: {
@@ -44,6 +45,8 @@ export const FavoritesList = () => {
                 'Authorization': 'Bearer ' + token
             }
         });
+        setLoaded(true);
+        setFavoritesList(userdata.followed);
         alert("function works") // remove this when the actual fetch is made
     }
 
@@ -81,7 +84,14 @@ export const FavoritesList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {listedFavorites}
+                            {loaded ? listedFavorites : (
+                                <div className="text-center my-5">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+
+                            )}
                         </tbody>
                     </table>
                 </div>

@@ -37,11 +37,15 @@ def get_user(user_id: int):
     return jsonify(user.serialize()), 200
 
   # reuse the same function you wrote for /signup
+
+
 @api.route("/users", methods=["POST"])
 def create_user():
     return signup()
 
 # --- Sign up (create user) ---
+
+
 @api.route("/signup", methods=["POST"])
 def signup():
     data = request.get_json(silent=True) or {}
@@ -163,7 +167,7 @@ def get_user_protected_follows_route():
     current_user_id = get_jwt_identity()
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
-    return jsonify({"id": user.id, "followed": user.followed}), 200
+    return jsonify({"id": user.id, "followed": [u.serialize() for u in user.followed]}), 200
 
 
 @api.route('/protected/followed/<str:action>/<int:target_id>', methods=['PUT'])
@@ -179,4 +183,4 @@ def put_user_protected_follows_route(action: str, target_id: int):
     elif action == "remove":
         user.followed.remove(target)
     db.session.commit()
-    return jsonify({"id": user.id, "followed": user.followed}), 200
+    return jsonify({"id": user.id, "followed": [u.serialize() for u in user.followed]}), 200
