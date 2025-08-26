@@ -1,3 +1,5 @@
+import Timer from "../components/Timer";
+
 export default function EventDetails() {
   const mockEvent = {
     id: 1,
