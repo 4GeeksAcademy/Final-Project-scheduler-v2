@@ -18,7 +18,7 @@ export const CreateGoal = () => {
 
     function changeGoalData(e) {
         setGoalData({
-            ...FormData,
+            ...goalData,
             [e.target.name]: e.target.value,
         });
     };

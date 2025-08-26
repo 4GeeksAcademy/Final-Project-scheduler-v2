@@ -5,6 +5,7 @@ export const CreateEvent = () => {
     const [repeatType, setRepeatType] = useState("Daily");
     const [publicEvent, setPublicEvent] = useState(false);
     const [timer, setTimer] = useState(false);
+    const [eventWeekdays, setEventWeekdays] = useState({});
     const [eventData, setEventData] = useState({
         "date": null,
         "name": null,
@@ -13,7 +14,7 @@ export const CreateEvent = () => {
         "attendees": null,
         "visibility": null,
         "host": null,
-        "repeat": null, //maybe have this look like an object? thinking it'll look like
+        "repeat": null, //maybe have this look like an object? thinking it'll look like 
         "description": null,
         "goalAmount": null, // optional thinking it'll look like {goal1:{amount:X,total:Y},goal2:{amount:X,total:Y}}
         "timer": null //optional thinking it'll look like {hours:X,minutes:Y,seconds:Z}
@@ -24,29 +25,41 @@ export const CreateEvent = () => {
     }, [repeatType])
 
     function changeEventData(e) {
-        setEventData({
-            ...FormData,
-            [e.target.name]: e.target.value,
+        setEventData((oldEventData) => {
+            return {
+                ...oldEventData,
+                [e.target.name]: e.target.value,
+            }
         });
     };
 
-    function setWeekdays(day) {
+    function changeWeekdays(e) {
         //here to set up the weekdays of the event if applicable, maybe this is stored in the eventData object as another object
+        console.log("TESTING:", e.target.value)
+        // setEventWeekdays((oldEventWeekdays)=>{return{
+        //     ...oldEventWeekdays,
+        //     [e.target.id]: e.target.value,
+        // }});
     }
 
     function sendEventData() {
         //the following 4 lines needs a bit more details on how the data is gonna be stored
-        //line about setting the repeat value in eventData to the repeatType State
+        if (repeatType == "Daily") {
+            setEventData((oldEventData) => { return { ...oldEventData, "repeat": eventWeekdays } })
+        } else {
+            setEventData((oldEventData) => { return { ...oldEventData, "repeat": null } })
+        }
         //line about setting the visibility value in eventData to the publicEvent State
         //line about setting the timer value in eventData to the timer State
         //line about setting the description value in eventData to the description State
         console.log(eventData);
+        //FETCH HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //fetch line doing a POST to database to creat event usign the eventData object
 
     }
     let weeklyCheckboxes = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday"].map((days, index) => (
         <div className="mb-3 mx-2 form-check" key={index}>
-            <input type="checkbox" className="form-check-input" id={days} onChange={() => setWeekdays(days)} />
+            <input type="checkbox" className="form-check-input" id={days} onChange={changeWeekdays} />
             <label className="form-check-label">{days}</label>
         </div>));
 

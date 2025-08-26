@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy import select
 
-from .models import db, Userdata  # User is unused
+from .models import db, Userdata, Events  # User is unused
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
@@ -16,6 +16,7 @@ from flask import Blueprint, request, jsonify
 from api.utils import generate_sitemap, APIException
 from api.models import db, User, Events
 from flask import Flask, request, jsonify, url_for, Blueprint
+from datetime import datetime
 
 
 api = Blueprint("api", __name__)
@@ -31,20 +32,52 @@ def handle_hello():
     return jsonify(response_body), 200
 
 
-@api.route('/createEvent', methods=['POST'])
-def post_event_route():
+# @api.route('/createEvent', methods=['POST'])
+# def post_event_route():
 
-    # do updating in the database
-    request_data = request.json
-    user_id = request_data["host"]
-    # user = User.query.get(user_id)
+#     # do updating in the database
+#     request_data = request.json
+#     user_id = request_data["host"]
+#     # user = User.query.get(user_id)
+#     new_event = Events(
+#         # fill all this in with the data needed to create an event
+#     )
+#     # db.session.add(new_event)
+#     # db.session.commit()
+
+#     return jsonify("ok"), 200
+@api.route('/create/event', methods=['POST'])
+def post_event_create_route():
+    request_body = request.json
+    current_user_id = request_body
+    user = db.session.execute(select(Userdata).where(
+        Userdata.id == current_user_id)).scalar_one_or_none()
+
+    # On the backend, datetime.strptime(time_str, "%H:%M").time() converts it into a time object SQLAlchemy can store.
+    # When returning the event, you can convert it back to "HH:MM" with .strftime("%H:%M")
+
+    # Convert string to datetime.time
+    event_time_obj = datetime.strptime(request_body["time"], "%H:%M").time()
+    event_date_obj = datetime.strptime(request_body["date"], "%Y-%m-%d").date()
+
     new_event = Events(
-        # fill all this in with the data needed to create an event
+        name=request_body["name"],
+        date=event_date_obj,
+        time=event_time_obj,
+        # originally intended to set this to user[timezone] but user doesnt have that field
+        timezone=request_body["timezone"],
+        attendees=[],
+        visibility=request_body["visibility"],
+        host_id=user["id"],
+        host=user,
+        repeat=request_body["repeat"],
+        description=request_body["description"],
+        timer=request_body["timer"]
     )
-    # db.session.add(new_event)
-    # db.session.commit()
-
-    return jsonify("ok"), 200
+    db.session.add(new_event)
+    new_event.attendees.append(user)
+    db.session.commit()
+    return jsonify({"id": user.id, "createdEvent": new_event}), 200
 
 
 @api.route('/editEvent', methods=['PUT'])
@@ -211,7 +244,7 @@ def get_user_protected_follows_route():
     return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
 
 
-@api.route('/protected/followed/<str:action>/<int:target_id>', methods=['PUT'])
+@api.route('/protected/followed/<string:action>/<int:target_id>', methods=['PUT'])
 @jwt_required()
 def put_user_protected_follows_route(action: str, target_id: int):
     current_user_id = get_jwt_identity()
