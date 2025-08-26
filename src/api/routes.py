@@ -170,7 +170,7 @@ def get_user_protected_follows_route():
     return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
 
 
-@api.route('/protected/followed/<str:action>/<int:target_id>', methods=['PUT'])
+@api.route('/protected/followed/<string:action>/<int:target_id>', methods=['PUT'])
 @jwt_required()
 def put_user_protected_follows_route(action: str, target_id: int):
     current_user_id = get_jwt_identity()
