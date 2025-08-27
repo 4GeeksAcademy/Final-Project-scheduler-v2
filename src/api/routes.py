@@ -16,7 +16,7 @@ from flask import Blueprint, request, jsonify
 from api.utils import generate_sitemap, APIException
 from api.models import db, User, Events
 from flask import Flask, request, jsonify, url_for, Blueprint
-from datetime import datetime
+from datetime import datetime, date
 
 
 api = Blueprint("api", __name__)
@@ -52,17 +52,21 @@ def post_event_create_route():
     current_user_id = request_body
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
+    event_date = None
+    if request_body["date"] == None:
+        event_date = date.today()
+    else:
+        event_date = datetime.strptime(request_body["date"], "%Y-%m-%d").date()
 
     # On the backend, datetime.strptime(time_str, "%H:%M").time() converts it into a time object SQLAlchemy can store.
     # When returning the event, you can convert it back to "HH:MM" with .strftime("%H:%M")
 
     # Convert string to datetime.time
     event_time_obj = datetime.strptime(request_body["time"], "%H:%M").time()
-    event_date_obj = datetime.strptime(request_body["date"], "%Y-%m-%d").date()
 
     new_event = Events(
         name=request_body["name"],
-        date=event_date_obj,
+        date=event_date,
         time=event_time_obj,
         # originally intended to set this to user[timezone] but user doesnt have that field
         timezone=request_body["timezone"],

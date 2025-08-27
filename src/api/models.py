@@ -42,7 +42,7 @@ class Events(db.Model):
     name: Mapped[str] = mapped_column(unique=False, nullable=False)
     date: Mapped[Date] = mapped_column(Date, nullable=False)
     time: Mapped[Time] = mapped_column(Time, nullable=False)
-    timezone: Mapped[str] = mapped_column(unique=False, nullable=False)
+    timezone: Mapped[str] = mapped_column(unique=False, nullable=True)
     attendees: Mapped[List["Userdata"]] = relationship(
         secondary=attendee_relation_table,
         back_populates="attending_events_list")

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_BACKEND_URL
+
 export const CreateEvent = () => {
 
     const [repeatType, setRepeatType] = useState("Daily");
@@ -53,25 +55,31 @@ export const CreateEvent = () => {
         });
     }
 
-    function sendEventData() {
+    async function sendEventData() {
         //the following 4 lines needs a bit more details on how the data is gonna be stored
-        if (repeatType == "Daily") {
-            setEventData((oldEventData) => { return { ...oldEventData, "repeat": eventWeekdays } })
+        if (eventData.name === null) {
+            alert("Please enter a name for the event.");
+        } else if (eventData.time === null) {
+            alert("Please enter a start time for the event.")
         } else {
-            setEventData((oldEventData) => { return { ...oldEventData, "repeat": null } })
-        }
-        //line about setting the visibility value in eventData to the eventVisibility State
-        //line about setting the timer value in eventData to the timer State
-        setEventData((oldEventData) => {
-            return {
-                ...oldEventData,
-                "visibility": eventVisibility,
-                "timer": timer
+            if (repeatType == "Daily") {
+                setEventData((oldEventData) => { return { ...oldEventData, "repeat": eventWeekdays } })
+            } else {
+                setEventData((oldEventData) => { return { ...oldEventData, "repeat": null } })
             }
-        });
-        console.log(eventData);
-        //FETCH HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //fetch line doing a POST to database to creat event usign the eventData object
+            //line about setting the visibility value in eventData to the eventVisibility State
+            //line about setting the timer value in eventData to the timer State
+            setEventData((oldEventData) => {
+                return {
+                    ...oldEventData,
+                    "visibility": eventVisibility,
+                    "timer": timer
+                }
+            });
+            console.log(eventData);
+            ////////////////////////ONLY MISSING THE FETCH!!!!!!!!!!!!!!!!! NEEDS TO RESOLVE HOW TO ACCESS USER ID FIRST
+            // await fetch(`${API_URL}/protected/followed`,);
+        }
 
     }
     let weeklyCheckboxes = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday"].map((days, index) => (
