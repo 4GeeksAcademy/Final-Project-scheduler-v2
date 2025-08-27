@@ -28,7 +28,7 @@ export const router = createBrowserRouter(
 
     // Root Route: All navigation will start from here.
 
-   
+
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
       {/* Root shows Login */}
       <Route index element={<Login />} />
@@ -40,13 +40,10 @@ export const router = createBrowserRouter(
       <Route path="/goals" element={<GoalTracker />} />
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
-<<<<<<< HEAD
       <Route path="/profile/:userId" element={<ProfilePage />} />
       <Route path="/create/event" element={<CreateEvent />} />
       <Route path="/create/goal" element={<CreateGoal />} />
-=======
       <Route path="/events/:eventId" element={<EventDetails />} />
->>>>>>> 22766bd701168ffe15aba741caf611b38715b958
       <Route path="/favoritesList" element={<FavoritesList />} />
     </Route >
 
