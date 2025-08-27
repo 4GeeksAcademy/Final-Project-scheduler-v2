@@ -48,7 +48,7 @@ export default function EventDetails() {
           </div>
 
           <div>
-            ⏳ <strong>Timer:</strong> {mockEvent.timer}
+            ⏳ <strong>Timer:</strong> <Timer initialTime={1800} /> 
           </div>
         </div>
       </div>
