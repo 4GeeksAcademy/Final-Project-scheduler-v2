@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 export const CreateEvent = () => {
 
     const [repeatType, setRepeatType] = useState("Daily");
-    const [publicEvent, setPublicEvent] = useState(false);
-    const [timer, setTimer] = useState(false);
+    const [eventVisibility, setEventVisibility] = useState(false);
+    const [timerUsed, setTimerUsed] = useState(false);
+    const [timer, setTimer] = useState({ hours: 0, minutes: 0, seconds: 0 });
     const [eventWeekdays, setEventWeekdays] = useState({});
     const [eventData, setEventData] = useState({
         "date": null,
@@ -16,8 +17,7 @@ export const CreateEvent = () => {
         "host": null,
         "repeat": null, //maybe have this look like an object? thinking it'll look like 
         "description": null,
-        "goalAmount": null, // optional thinking it'll look like {goal1:{amount:X,total:Y},goal2:{amount:X,total:Y}}
-        "timer": null //optional thinking it'll look like {hours:X,minutes:Y,seconds:Z}
+        "timer": { hours: 0, minutes: 0, seconds: 0 }
     }); // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
 
     useEffect(() => {
@@ -28,18 +28,29 @@ export const CreateEvent = () => {
         setEventData((oldEventData) => {
             return {
                 ...oldEventData,
-                [e.target.name]: e.target.value,
+                [e.target.id]: e.target.value,
             }
         });
     };
 
     function changeWeekdays(e) {
         //here to set up the weekdays of the event if applicable, maybe this is stored in the eventData object as another object
-        console.log("TESTING:", e.target.value)
-        // setEventWeekdays((oldEventWeekdays)=>{return{
-        //     ...oldEventWeekdays,
-        //     [e.target.id]: e.target.value,
-        // }});
+        // console.log("TESTING:", e.target.checked)
+        setEventWeekdays((oldEventWeekdays) => {
+            return {
+                ...oldEventWeekdays,
+                [e.target.id]: e.target.checked,
+            }
+        });
+    }
+
+    function changeTimer(e) {
+        setTimer((oldTimer) => {
+            return {
+                ...oldTimer,
+                [e.target.id]: e.target.value,
+            }
+        });
     }
 
     function sendEventData() {
@@ -49,9 +60,15 @@ export const CreateEvent = () => {
         } else {
             setEventData((oldEventData) => { return { ...oldEventData, "repeat": null } })
         }
-        //line about setting the visibility value in eventData to the publicEvent State
+        //line about setting the visibility value in eventData to the eventVisibility State
         //line about setting the timer value in eventData to the timer State
-        //line about setting the description value in eventData to the description State
+        setEventData((oldEventData) => {
+            return {
+                ...oldEventData,
+                "visibility": eventVisibility,
+                "timer": timer
+            }
+        });
         console.log(eventData);
         //FETCH HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //fetch line doing a POST to database to creat event usign the eventData object
@@ -73,15 +90,15 @@ export const CreateEvent = () => {
                         <h1 className="text-light">Create Event:</h1>
                         <div className="mb-3">
                             <label className="form-label text-light">Event Name:</label>
-                            <input type="text" className="form-control w-50" id="name" onChange={changeEventData} />
+                            <input type="text" className="form-control w-50" id="name" value={eventData.name} onChange={changeEventData} />
                         </div>
                         <div className="dropdown">
                             <button className="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-describedby="publicHelp">
-                                {(publicEvent) ? "Public" : "Private"}
+                                {(eventVisibility === "Public") ? "Public" : "Private"}
                             </button>
                             <ul className="dropdown-menu">
-                                <li><button className="dropdown-item" onClick={() => setPublicEvent(True)}>Public</button></li>
-                                <li><button className="dropdown-item" onClick={() => setPublicEvent(False)}>Private</button></li>
+                                <li><button className="dropdown-item" onClick={() => setEventVisibility("Public")}>Public</button></li>
+                                <li><button className="dropdown-item" onClick={() => setEventVisibility("Private")}>Private</button></li>
                             </ul>
                         </div>
                         <div id="publicHelp" className="form-text mb-3">Switches if this event can be seen by others.</div>
@@ -97,11 +114,6 @@ export const CreateEvent = () => {
                         </div>
                         <div id="repeatHelp" className="form-text mb-3">How often you'll want this event to repeat.</div>
                         <form>
-                            <div className="mb-3 mt-2 form-check p-0">
-                                <label className="form-label text-light">Description:</label>
-                                <textarea className="form-control" rows="3" id="description" onChange={changeEventData}></textarea>
-                                <div className="form-text mb-3">Write details you want to note down about this event here.</div>
-                            </div>
                             {(repeatType == "No Repeat") ?
                                 (<span></span>) :
                                 (repeatType == "Date Specific") ?
@@ -118,25 +130,30 @@ export const CreateEvent = () => {
                                         </div>) : (<span></span>)}
                             <div className="mb-3">
                                 <label className="form-label text-light">Start Time:</label>
-                                <input type="time" className="form-control w-50" id="time" onChange={changeEventData} />
+                                <input type="time" className="form-control w-50" id="time" value={eventData.time} onChange={changeEventData} />
                             </div>
-
+                            <div className="mb-3 mt-2 form-check p-0">
+                                <label className="form-label text-light">Description:</label>
+                                <textarea className="form-control" rows="3" id="description" onChange={changeEventData} value={eventData.description}></textarea>
+                                <div className="form-text mb-3">Write details you want to note down about this event here.</div>
+                            </div>
                             <div className="mb-3 mt-5 form-check">
-                                <input type="checkbox" className="form-check-input" value={timer} onChange={() => setTimer(!timer)} />
+                                <input type="checkbox" className="form-check-input" checked={timerUsed} onChange={() => setTimerUsed(!timerUsed)} />
                                 <label className="form-label text-light">Set event duration Timer:</label>
                             </div>
-                            {(timer) ? (<div className="mb-3">
+
+                            {(timerUsed) ? (<div className="mb-3">
                                 <div className="d-flex flex-row">
                                     <div className="mb-3 mx-2 form-check">
-                                        <input type="number" className="form-control" id="Hours" />
+                                        <input type="number" className="form-control" id="hours" value={timer.hours} onChange={changeTimer} />
                                         <label className="form-check-label text-light">Hours</label>
                                     </div>
                                     <div className="mb-3 mx-2 form-check">
-                                        <input type="number" className="form-control" id="Minutes" />
+                                        <input type="number" className="form-control" id="minutes" value={timer.minutes} onChange={changeTimer} />
                                         <label className="form-check-label text-light">Minutes</label>
                                     </div>
                                     <div className="mb-3 mx-2 form-check">
-                                        <input type="number" className="form-control" id="Seconds" />
+                                        <input type="number" className="form-control" id="seconds" value={timer.seconds} onChange={changeTimer} />
                                         <label className="form-check-label text-light">Seconds</label>
                                     </div>
                                 </div>
