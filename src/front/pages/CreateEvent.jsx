@@ -78,7 +78,7 @@ export const CreateEvent = () => {
             });
             console.log(eventData);
             ////////////////////////ONLY MISSING THE FETCH!!!!!!!!!!!!!!!!! NEEDS TO RESOLVE HOW TO ACCESS USER ID FIRST
-            // await fetch(`${API_URL}/protected/followed`,);
+            await fetch(`${API_URL}/create/event`,);
         }
 
     }
