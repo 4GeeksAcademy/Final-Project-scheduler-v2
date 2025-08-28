@@ -1,6 +1,15 @@
 import Timer from "../components/Timer";
 
 export default function EventDetails() {
+
+  const eventColors = {
+    study: "bg-blue-200",
+    work: "bg-green-200",
+    personal: "bg-pink-200",
+    fitness: "bg-yellow-200"
+  };
+
+
   const mockEvent = {
     id: 1,
     title: "Study Group Session",
@@ -13,13 +22,14 @@ export default function EventDetails() {
     host: "Haley",
     repeat: "weekly",
     description: "Weekly study group for learning Python",
-    timer: "00:30:00"
+    timer: "00:30:00",
+    eventType: "study"
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center py-10">
-      <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md border">
-        
+      <div className={`w-full max-w-lg p-6 rounded-lg shadow-md border ${eventColors[mockEvent.eventType]}`}>
+
         {/* Title + Host */}
         <h1 className="text-2xl font-bold mb-1">{mockEvent.title}</h1>
         <p className="text-gray-500 text-sm mb-4">
@@ -48,7 +58,7 @@ export default function EventDetails() {
           </div>
 
           <div>
-            ⏳ <strong>Timer:</strong> <Timer initialTime={1800} /> 
+            ⏳ <strong>Timer:</strong> <Timer initialTime={1800} />
           </div>
         </div>
       </div>
