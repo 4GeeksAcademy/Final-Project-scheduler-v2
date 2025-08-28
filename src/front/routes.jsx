@@ -8,6 +8,8 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
+import { CreateEvent } from "./pages/CreateEvent";
+import { CreateGoal } from "./pages/CreateGoal.jsx";
 import { Signup } from "./pages/Signup";
 import { FavoritesList } from "./pages/FavoritesList";
 import ProfilePage from "./pages/Profile-page";
@@ -26,7 +28,7 @@ export const router = createBrowserRouter(
 
     // Root Route: All navigation will start from here.
 
-   
+
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
       {/* Root shows Login */}
       <Route index element={<Login />} />
@@ -38,6 +40,9 @@ export const router = createBrowserRouter(
       <Route path="/goals" element={<GoalTracker />} />
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
+      <Route path="/profile/:userId" element={<ProfilePage />} />
+      <Route path="/create/event" element={<CreateEvent />} />
+      <Route path="/create/goal" element={<CreateGoal />} />
       <Route path="/events/:eventId" element={<EventDetails />} />
       <Route path="/favoritesList" element={<FavoritesList />} />
     </Route >
