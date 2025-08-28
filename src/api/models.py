@@ -128,8 +128,7 @@ class Goals(db.Model):
     visibility: Mapped[str] = mapped_column(unique=False, nullable=False)
     host_id: Mapped[int] = mapped_column(ForeignKey("userdata.id"))
     host: Mapped["Userdata"] = relationship(
-        back_populates="hosting_events_list",
-        cascade="all, delete-orphan")
+        back_populates="goals")
     goalAmount: Mapped[int] = mapped_column(unique=False, nullable=False)
 
     def serialize(self):
