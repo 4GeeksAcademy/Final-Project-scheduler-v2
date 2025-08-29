@@ -86,7 +86,7 @@ export const CreateEvent = () => {
                 }
             });
             ////////////////////////ONLY MISSING THE FETCH!!!!!!!!!!!!!!!!! NEEDS TO RESOLVE HOW TO ACCESS USER ID FIRST
-            await fetch(`${API_URL}/api/create/event`, {
+            await fetch(`${API_URL}api/create/event`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(eventData)
