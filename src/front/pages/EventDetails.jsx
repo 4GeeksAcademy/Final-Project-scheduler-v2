@@ -13,13 +13,17 @@ export default function EventDetails() {
     host: "Haley",
     repeat: "weekly",
     description: "Weekly study group for learning Python",
-    timer: "00:30:00"
+    timer: "00:30:00",
+    color: "#3B82F6" 
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center py-10">
-      <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md border">
-        
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 pt-16">
+      {/* Event Card */}
+      <div
+        className="w-full max-w-lg p-6 rounded-lg shadow-md border"
+        style={{ backgroundColor: mockEvent.color }}
+      >
         {/* Title + Host */}
         <h1 className="text-2xl font-bold mb-1">{mockEvent.title}</h1>
         <p className="text-gray-500 text-sm mb-4">
@@ -48,7 +52,7 @@ export default function EventDetails() {
           </div>
 
           <div>
-            ⏳ <strong>Timer:</strong> <Timer initialTime={1800} /> 
+            ⏳ <strong>Timer:</strong> <Timer initialTime={1800} />
           </div>
         </div>
       </div>
