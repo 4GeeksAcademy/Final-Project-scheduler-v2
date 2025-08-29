@@ -14,7 +14,7 @@ export default function EventDetails() {
     repeat: "weekly",
     description: "Weekly study group for learning Python",
     timer: "00:30:00",
-    color: "#3B82F6" // <-- User-chosen color
+    color: "#3B82F6" 
   };
 
   return (
