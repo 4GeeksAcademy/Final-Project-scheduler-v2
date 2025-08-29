@@ -1,15 +1,6 @@
 import Timer from "../components/Timer";
 
 export default function EventDetails() {
-
-  const eventColors = {
-    study: "bg-blue-200",
-    work: "bg-green-200",
-    personal: "bg-pink-200",
-    fitness: "bg-yellow-200"
-  };
-
-
   const mockEvent = {
     id: 1,
     title: "Study Group Session",
@@ -23,13 +14,16 @@ export default function EventDetails() {
     repeat: "weekly",
     description: "Weekly study group for learning Python",
     timer: "00:30:00",
-    eventType: "study"
+    color: "#3B82F6" // <-- User-chosen color
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center py-10">
-      <div className={`w-full max-w-lg p-6 rounded-lg shadow-md border ${eventColors[mockEvent.eventType]}`}>
-
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 pt-16">
+      {/* Event Card */}
+      <div
+        className="w-full max-w-lg p-6 rounded-lg shadow-md border"
+        style={{ backgroundColor: mockEvent.color }}
+      >
         {/* Title + Host */}
         <h1 className="text-2xl font-bold mb-1">{mockEvent.title}</h1>
         <p className="text-gray-500 text-sm mb-4">
