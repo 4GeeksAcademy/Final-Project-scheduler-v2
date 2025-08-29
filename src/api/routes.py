@@ -49,7 +49,7 @@ def handle_hello():
 @api.route('/create/event', methods=['POST'])
 def post_event_create_route():
     request_body = request.json
-    current_user_id = request_body
+    current_user_id = request_body["user_id"]
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
     event_date = None
@@ -72,7 +72,7 @@ def post_event_create_route():
         timezone=request_body["timezone"],
         attendees=[],
         visibility=request_body["visibility"],
-        host_id=user["id"],
+        host_id=current_user_id,
         host=user,
         repeat=request_body["repeat"],
         description=request_body["description"],
@@ -81,7 +81,7 @@ def post_event_create_route():
     db.session.add(new_event)
     new_event.attendees.append(user)
     db.session.commit()
-    return jsonify({"id": user.id, "createdEvent": new_event}), 200
+    return jsonify({"createdEvent": new_event.serialize()}), 200
 
 
 @api.route('/editEvent', methods=['PUT'])
@@ -262,3 +262,9 @@ def put_user_protected_follows_route(action: str, target_id: int):
         user.followed.remove(target)
     db.session.commit()
     return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
+
+
+@api.route("/events", methods=["GET"])
+def list_events():
+    events = Events.query.order_by(Events.id.desc()).all()
+    return jsonify([e.serialize() for e in events]), 200
