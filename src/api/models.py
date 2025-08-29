@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Time, Date, ForeignKey, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
+from datetime import datetime, date
 
 db = SQLAlchemy()
 # the following are relationship association tables:
@@ -54,16 +55,20 @@ class Events(db.Model):
     description: Mapped[str] = mapped_column(unique=False, nullable=True)
     timer: Mapped[dict] = mapped_column(JSON, nullable=True)
 
+    def serialize_attendees(self):
+        return {
+            "attendees": [u.serialize() for u in self.attendees]
+        }
+
     def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
-            "date": self.date,
-            "time": self.time,
+            "date": self.date.strftime("%Y-%m-%d"),
+            "time": self.time.strftime("%H:%M"),
             "timezone": self.timezone,
-            "attendees": self.attendees,
             "visibility": self.visibility,
-            "host": self.host,
+            "host_id": self.host_id,
             "repeat": self.repeat,
             "description": self.description,
             "timer": self.timer

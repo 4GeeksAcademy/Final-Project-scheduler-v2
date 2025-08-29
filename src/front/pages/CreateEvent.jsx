@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
 export const CreateEvent = () => {
 
+    const navigate = useNavigate();
     const [repeatType, setRepeatType] = useState("Daily");
     const [eventVisibility, setEventVisibility] = useState(false);
     const [timerUsed, setTimerUsed] = useState(false);
@@ -77,8 +79,20 @@ export const CreateEvent = () => {
                 }
             });
             console.log(eventData);
+            setEventData((oldEventData) => {
+                return {
+                    ...oldEventData,
+                    "user_id": 1
+                }
+            });
             ////////////////////////ONLY MISSING THE FETCH!!!!!!!!!!!!!!!!! NEEDS TO RESOLVE HOW TO ACCESS USER ID FIRST
-            await fetch(`${API_URL}/create/event`,);
+            await fetch(`${API_URL}/api/create/event`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(eventData)
+            });
+            navigate('/profile/1');
+            alert("Event Created!");
         }
 
     }
