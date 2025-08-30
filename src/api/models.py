@@ -41,8 +41,8 @@ class User(db.Model):
 class Events(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(unique=False, nullable=False)
-    date: Mapped[Date] = mapped_column(Date, nullable=False)
-    time: Mapped[Time] = mapped_column(Time, nullable=False)
+    date: Mapped[str] = mapped_column(nullable=False)
+    time: Mapped[str] = mapped_column(nullable=False)
     timezone: Mapped[str] = mapped_column(unique=False, nullable=True)
     attendees: Mapped[List["Userdata"]] = relationship(
         secondary=attendee_relation_table,
@@ -64,8 +64,8 @@ class Events(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "date": self.date.strftime("%Y-%m-%d"),
-            "time": self.time.strftime("%H:%M"),
+            "date": self.date,
+            "time": self.time,
             "timezone": self.timezone,
             "visibility": self.visibility,
             "host_id": self.host_id,

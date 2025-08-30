@@ -6,7 +6,7 @@ export default function EventDetails() {
     title: "Study Group Session",
     date: "8/22/25",
     name: "Haley",
-    time: "10am",
+    time: "10am", // make a fetch call, set fetch= *some variable* replace mockevent with whatever i store the fetch request with -HALEY notes for later!
     timezone: "EST",
     attendees: ["Haley", "Connor", "Rudy"],
     visibility: "public",

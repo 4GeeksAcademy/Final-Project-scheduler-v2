@@ -53,21 +53,18 @@ def post_event_create_route():
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
     event_date = None
-    if request_body["date"] == None:
-        event_date = date.today()
-    else:
-        event_date = datetime.strptime(request_body["date"], "%Y-%m-%d").date()
+   
 
     # On the backend, datetime.strptime(time_str, "%H:%M").time() converts it into a time object SQLAlchemy can store.
     # When returning the event, you can convert it back to "HH:MM" with .strftime("%H:%M")
 
     # Convert string to datetime.time
-    event_time_obj = datetime.strptime(request_body["time"], "%H:%M").time()
+   
 
     new_event = Events(
         name=request_body["name"],
-        date=event_date,
-        time=event_time_obj,
+        date=request_body["date"],
+        time=request_body["time"],
         # originally intended to set this to user[timezone] but user doesnt have that field
         timezone=request_body["timezone"],
         attendees=[],
