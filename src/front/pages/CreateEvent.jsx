@@ -12,15 +12,15 @@ export const CreateEvent = () => {
     const [timer, setTimer] = useState({ hours: 0, minutes: 0, seconds: 0 });
     const [eventWeekdays, setEventWeekdays] = useState({});
     const [eventData, setEventData] = useState({
-        "date": null,
-        "name": null,
-        "time": null,
-        "timezone": null,
-        "attendees": null,
-        "visibility": null,
-        "host": null,
-        "repeat": null, //maybe have this look like an object? thinking it'll look like 
-        "description": null,
+        "date": "",
+        "user_id": 1,
+        "name": "",
+        "time": "",
+        "timezone": "",
+        "attendees": [],
+        "visibility": "Private",
+        "repeat": {}, //maybe have this look like an object? thinking it'll look like 
+        "description": "",
         "timer": { hours: 0, minutes: 0, seconds: 0 }
     }); // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
 
@@ -79,12 +79,6 @@ export const CreateEvent = () => {
                 }
             });
             console.log(eventData);
-            setEventData((oldEventData) => {
-                return {
-                    ...oldEventData,
-                    "user_id": 1
-                }
-            });
             ////////////////////////ONLY MISSING THE FETCH!!!!!!!!!!!!!!!!! NEEDS TO RESOLVE HOW TO ACCESS USER ID FIRST
             await fetch(`${API_URL}api/create/event`, {
                 method: "POST",
