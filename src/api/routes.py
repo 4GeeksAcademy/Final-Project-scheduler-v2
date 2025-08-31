@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy import select
-
 from .models import db, Userdata, Events  # User is unused
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -161,6 +160,23 @@ def signup():
         return jsonify({"error": "username or email already exists"}), 409
 
     return jsonify({"message": "User created successfully", "user": user.serialize()}), 201
+
+# Create a route to authenticate your users and return JWT Token
+@api.route("/token", methods=["POST"])
+def create_token():
+    data = request.get_json(silent=True) or {}
+    username = (data.get("username") or "").strip()
+    password = data.get("password") or ""
+
+    if not username or not password:
+        return jsonify({"msg": "username and password are required"}), 400
+
+    user = Userdata.query.filter_by(username=username).first()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    token = create_access_token(identity=user.id)
+    return jsonify({"token": token, "user_id": user.id, "username": user.username}), 200
 
 
 # --- Login ---
