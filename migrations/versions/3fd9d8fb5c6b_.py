@@ -15,7 +15,8 @@ def _has_table(name: str, schema: str | None = "public") -> bool:
     insp = sa.inspect(bind)
     # some dialects have has_table; otherwise fall back to get_table_names
     try:
-        return insp.has_table(name, schema=schema)  # type: ignore[attr-defined]
+        # type: ignore[attr-defined]
+        return insp.has_table(name, schema=schema)
     except Exception:
         return name in set(insp.get_table_names(schema=schema))
 
