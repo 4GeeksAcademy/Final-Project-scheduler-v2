@@ -80,7 +80,7 @@ export const CreateEvent = () => {
             console.log(eventData);
 
             const token = localStorage.getItem('token');
-            await fetch(`${API_URL}api/create/event`, {
+            let eventObj = await fetch(`${API_URL}api/create/event`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,7 +88,8 @@ export const CreateEvent = () => {
                 },
                 body: JSON.stringify(eventData)
             });
-            navigate('/profile/1');
+            user_id = eventObj["host_id"];
+            navigate(`/profile/${user_id}`);
             alert("Event Created!");
         }
 
