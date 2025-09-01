@@ -48,7 +48,7 @@ const GoalTracker = () => {
                     <p className="text-gray-500 text-lg">Set a target and track your progress!</p>
                 </div>
 
-                
+
                 <div className="flex flex-col md:flex-row gap-4">
                     <input
                         type="text"

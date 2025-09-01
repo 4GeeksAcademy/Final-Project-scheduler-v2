@@ -7,13 +7,116 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy import select
-
+import requests
 from .models import db, Userdata  # User is unused
 
 api = Blueprint("api", __name__)
 CORS(api)
 
 ALLOWED_GENDERS = {"male", "female", "other"}
+TODOIST_API_TOKEN = '740a4c51dae74f7f154910e22d9545e4ac383d78'
+TODOIST_API_URL = 'https://api.todoist.com/rest/v2'
+
+
+def get_todoist_headers():
+    """Returns the HTTP headers required for Todoist API authentication."""
+    return {
+        'Authorization': f'Bearer {TODOIST_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+
+
+def map_todoist_tasks_to_goals(tasks):
+
+    goals = []
+    for task in tasks:
+        text = task['content']
+        completions = 0
+        target = 1
+
+        if '(' in text and ')' in text:
+            try:
+                parts = text.split('(')[-1].split(')')[0].split('/')
+                completions = int(parts[0])
+                target = int(parts[1])
+                text = text.split('(')[0].strip()
+            except (ValueError, IndexError):
+                pass
+
+        goals.append({
+            'id': task['id'],
+            'text': text,
+            'completions': completions,
+            'target': target,
+            'addedBy': 'unknown',
+        })
+    return goals
+
+
+@api.route('/goals', methods=['GET'])
+def get_goals():
+    """Endpoint to retrieve all goals from the Todoist API."""
+    try:
+        response = requests.get(
+            f'{TODOIST_API_URL}/tasks', headers=get_todoist_headers())
+        response.raise_for_status()
+        tasks = response.json()
+        goals = map_todoist_tasks_to_goals(tasks)
+        return jsonify(goals)
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@api.route('/goals', methods=['POST'])
+def add_goal():
+    """Endpoint to add a new goal to the Todoist API."""
+    data = request.json
+    try:
+        new_task_data = {
+            'content': data['text'],
+        }
+        response = requests.post(
+            f'{TODOIST_API_URL}/tasks', headers=get_todoist_headers(), json=new_task_data)
+        response.raise_for_status()
+        new_task = response.json()
+        return jsonify({'id': new_task['id'], 'text': new_task['content'], 'completions': 0, 'target': data['target']}), 201
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@api.route('/goals/<goal_id>', methods=['PUT'])
+def update_goal(goal_id):
+    """Endpoint to update a specific goal in the Todoist API."""
+    data = request.json
+    try:
+        task_response = requests.get(
+            f'{TODOIST_API_URL}/tasks/{goal_id}', headers=get_todoist_headers())
+        task_response.raise_for_status()
+        current_task = task_response.json()
+
+        new_text = f"{current_task['content'].split('(')[0].strip()} ({data['completions']}/{data['target']})"
+
+        update_response = requests.post(
+            f'{TODOIST_API_URL}/tasks/{goal_id}', headers=get_todoist_headers(), json={'content': new_text})
+        update_response.raise_for_status()
+
+        return jsonify({'id': goal_id, 'completions': data['completions']})
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@api.route('/goals/<goal_id>', methods=['DELETE'])
+def delete_goal(goal_id):
+    """Endpoint to delete a specific goal from the Todoist API."""
+    try:
+        response = requests.delete(
+            f'{TODOIST_API_URL}/tasks/{goal_id}', headers=get_todoist_headers())
+        response.raise_for_status()
+        return jsonify({'message': 'Goal deleted'}), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- end of goal page ---
 
 
 @api.route("/hello", methods=["GET", "POST"])
