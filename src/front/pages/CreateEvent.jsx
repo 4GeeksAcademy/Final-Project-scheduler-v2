@@ -13,7 +13,6 @@ export const CreateEvent = () => {
     const [eventWeekdays, setEventWeekdays] = useState({});
     const [eventData, setEventData] = useState({
         "date": "",
-        "user_id": 1,
         "name": "",
         "time": "",
         "timezone": "",
@@ -78,14 +77,21 @@ export const CreateEvent = () => {
                     "timer": timer
                 }
             });
-            console.log(eventData);
-            ////////////////////////ONLY MISSING THE FETCH!!!!!!!!!!!!!!!!! NEEDS TO RESOLVE HOW TO ACCESS USER ID FIRST
-            await fetch(`${API_URL}api/create/event`, {
+            console.log("eventData: ", eventData)
+
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}api/create/event`, {
                 method: "POST",
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
                 body: JSON.stringify(eventData)
             });
-            navigate('/profile/1');
+            const eventObj = await response.json();
+            let user_id = eventObj["createdEvent"]["host_id"]
+            console.log(eventObj)
+            navigate(`/profile/${user_id}`);
             alert("Event Created!");
         }
 
