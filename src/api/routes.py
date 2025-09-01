@@ -43,12 +43,12 @@ def handle_hello():
 #     )
 #     # db.session.add(new_event)
 #     # db.session.commit()
-
 #     return jsonify("ok"), 200
 @api.route('/create/event', methods=['POST'])
+@jwt_required()
 def post_event_create_route():
     request_body = request.json
-    current_user_id = request_body["user_id"]
+    current_user_id = get_jwt_identity()
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
 
