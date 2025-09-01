@@ -22,8 +22,8 @@ export const FavoritesList = () => {
     useEffect(async () => {
         //insert some bs about aking a fetch call to the Database for a list of user's Favorites (probably a protected view)
         // Retrieve token from localStorage
-        const token = localStorage.getItem('jwt-token');
-        const userdata = await fetch(`${API_URL}/protected/followed`, {
+        const token = localStorage.getItem('token');
+        const userdata = await fetch(`${API_URL}protected/followed`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -33,12 +33,13 @@ export const FavoritesList = () => {
         setLoaded(true);
         setFavoritesList(userdata.followed);
 
-    }, [favoritesList])
+    }, [favoritesList]);
 
     async function removeFriend(target_id) {
         // database fetch to remove friend
         setLoaded(false);
-        const userdata = await fetch(`${API_URL}/protected/followed/remove/${target_id}`, {
+        const token = localStorage.getItem('token');
+        const userdata = await fetch(`${API_URL}protected/followed/remove/${target_id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
