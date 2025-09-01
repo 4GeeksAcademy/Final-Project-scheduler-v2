@@ -150,6 +150,8 @@ def signup():
     return jsonify({"message": "User created successfully", "user": user.serialize()}), 201
 
 # Create a route to authenticate your users and return JWT Token
+
+
 @api.route("/token", methods=["POST"])
 def create_token():
     data = request.get_json(silent=True) or {}
@@ -163,7 +165,7 @@ def create_token():
     if not user or not check_password_hash(user.password, password):
         return jsonify({"msg": "Bad username or password"}), 401
 
-    token = create_access_token(identity=user.id)
+    token = create_access_token(identity=str(user.id))
     return jsonify({"token": token, "user_id": user.id, "username": user.username}), 200
 
 

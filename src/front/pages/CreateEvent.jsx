@@ -77,10 +77,10 @@ export const CreateEvent = () => {
                     "timer": timer
                 }
             });
-            console.log(eventData);
+            console.log("eventData: ", eventData)
 
             const token = localStorage.getItem('token');
-            let eventObj = await fetch(`${API_URL}api/create/event`, {
+            const response = await fetch(`${API_URL}api/create/event`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,7 +88,9 @@ export const CreateEvent = () => {
                 },
                 body: JSON.stringify(eventData)
             });
-            user_id = eventObj["host_id"];
+            const eventObj = await response.json();
+            let user_id = eventObj["createdEvent"]["host_id"]
+            console.log(eventObj)
             navigate(`/profile/${user_id}`);
             alert("Event Created!");
         }
