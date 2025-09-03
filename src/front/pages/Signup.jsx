@@ -33,7 +33,7 @@ export const Signup = () => {
     setErrorMsg("");
     setSuccessMsg("");
 
-    const apiUrl = backendUrl + "/api/signup";
+    const apiUrl = backendUrl + "api/signup";
 
     const bodyData = {
       username: username,
