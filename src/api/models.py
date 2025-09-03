@@ -93,8 +93,8 @@ class Userdata(db.Model):
         secondary=attendee_relation_table,
         back_populates="attendees")
     # goals
-    goals: Mapped[List["Goals"]] = relationship(
-        back_populates="host", cascade="all, delete-orphan")
+    goals: Mapped[List["Goal"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan")
     # followers
     followed = db.relationship(
         'Userdata',
@@ -133,7 +133,8 @@ class Goal(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     text: Mapped[str] = mapped_column(unique=False, nullable=False)
     target: Mapped[int] = mapped_column(Integer, unique=False, nullable=False)
-    completions: Mapped[int] = mapped_column(Integer, unique=False, nullable=False, default=0)
+    completions: Mapped[int] = mapped_column(
+        Integer, unique=False, nullable=False, default=0)
     user_id: Mapped[int] = mapped_column(ForeignKey("userdata.id"))
     user: Mapped["Userdata"] = relationship(back_populates="goals")
 
