@@ -4,12 +4,12 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
+import SettingsPage from "./pages/settings-page";
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import { CreateEvent } from "./pages/CreateEvent";
-import { CreateGoal } from "./pages/CreateGoal.jsx";
 import { Signup } from "./pages/Signup";
 import { FavoritesList } from "./pages/FavoritesList";
 import ProfilePage from "./pages/Profile-page";
@@ -35,6 +35,7 @@ export const router = createBrowserRouter(
       <Route index element={<Login />} />
 
       {/* Pages */}
+      <Route path="/settings" element={<SettingsPage />} />
       <Route path="/home" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
@@ -43,7 +44,6 @@ export const router = createBrowserRouter(
       <Route path="/demo" element={<Demo />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
       <Route path="/create/event" element={<CreateEvent />} />
-      <Route path="/create/goal" element={<CreateGoal />} />
       <Route path="/events/:eventId" element={<EventDetails />} />
       <Route path="/favoritesList" element={<FavoritesList />} />
       <Route path="/searchTest" element={<UserSearch />} />
