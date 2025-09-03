@@ -59,7 +59,7 @@ export const FavoritesList = () => {
     let listedFavorites = favoritesList.map((friend, index) => (
         <tr key={index}>
             <td>{`${friend["FirstName"]} ${friend["LastName"]}`}</td>
-            <td><button>View Profile</button></td>
+            <td><Link to={`/profile/${friend["id"]}`}><button>View Profile</button></Link></td>
             <td><button onClick={() => removeFriend(friend.id)}>Remove</button></td>
         </tr>));
 
