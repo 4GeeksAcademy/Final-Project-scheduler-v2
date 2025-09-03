@@ -20,7 +20,11 @@ export function UserSearch() {
         setSearched(true)
     }
 
-    useEffect(() => { if (input === "") { setSearched(false) } }, [result]);
+    useEffect(() => {
+        if (input === "") {
+            setSearched(false)
+        }
+    }, [result]);
 
     let resultWindow = result.map((user, index) => (
         <div key={index} className="card p-5 shadow-sm rounded-3 mb-3" style={{ maxWidth: "500px", width: "70%" }}>

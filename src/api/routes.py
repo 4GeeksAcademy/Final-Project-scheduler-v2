@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy import select
-import requests
 from .models import db, Userdata, Events  # User is unused
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -21,8 +20,6 @@ api = Blueprint("api", __name__)
 CORS(api)
 
 ALLOWED_GENDERS = {"male", "female", "other"}
-
-
 
 
 @api.route("/hello", methods=["GET", "POST"])
@@ -95,7 +92,20 @@ def list_users():
     return jsonify([u.serialize() for u in users]), 200
 
 
+@api.route("/usersGoals", methods=["GET"])
+def list_users_goals():
+    users = Userdata.query.order_by(Userdata.id.desc()).all()
+    return jsonify([u.serialize_user_goals() for u in users]), 200
+
+
+@api.route("/usersEvents", methods=["GET"])
+def list_users_events():
+    users = Userdata.query.order_by(Userdata.id.desc()).all()
+    return jsonify([u.serialize_user_events() for u in users]), 200
+
 # --- Get one user by id ---
+
+
 @api.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id: int):
     user = db.session.get(Userdata, user_id)  # SQLAlchemy 2.x style
@@ -285,7 +295,7 @@ def get_search_user_route(search_name: str):
     return jsonify({"search_results": [u.serialize() for u in user_list]}), 200
 
 
-#-- its me, goals api.routes ---
+# -- its me, goals api.routes ---
 
 # Route to get all goals for the current authenticated user
 @api.route("/goals", methods=["GET"])
@@ -296,11 +306,13 @@ def get_goals():
 
     # Query the database for all goals belonging to this user
     user_goals = Goal.query.filter_by(user_id=current_user_id).all()
-    
+
     # Serialize the goals to a list of dictionaries and return them
     return jsonify({"goals": [goal.serialize() for goal in user_goals]}), 200
 
 # Route to create a new goal for the current authenticated user
+
+
 @api.route("/goals", methods=["POST"])
 @jwt_required()
 def add_goal():
@@ -313,7 +325,7 @@ def add_goal():
         text=data['text'],
         target=data['target'],
         completions=data['completions'],
-        user_id=current_user_id # Associate the goal with the user
+        user_id=current_user_id  # Associate the goal with the user
     )
 
     db.session.add(new_goal)
@@ -321,6 +333,8 @@ def add_goal():
     return jsonify({"message": "Goal added successfully"}), 201
 
 # Route to update a specific goal
+
+
 @api.route("/goals/<int:goal_id>", methods=["PUT"])
 @jwt_required()
 def update_goal(goal_id):
@@ -328,11 +342,12 @@ def update_goal(goal_id):
     current_user_id = get_jwt_identity()
 
     # Find the specific goal by its ID and ensure it belongs to the current user
-    goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first_or_404()
-    
+    goal = Goal.query.filter_by(
+        id=goal_id, user_id=current_user_id).first_or_404()
+
     # Get the new data from the request body
     data = request.get_json()
-    
+
     # Update the goal's completion count
     goal.completions = data.get('completions', goal.completions)
 
@@ -341,6 +356,7 @@ def update_goal(goal_id):
 
 # Route to delete a specific goal
 
+
 @api.route("/goals/<int:goal_id>", methods=["DELETE"])
 @jwt_required()
 def delete_goal(goal_id):
@@ -348,7 +364,8 @@ def delete_goal(goal_id):
     current_user_id = get_jwt_identity()
 
     # Find the specific goal by its ID and ensure it belongs to the current user
-    goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first_or_404()
+    goal = Goal.query.filter_by(
+        id=goal_id, user_id=current_user_id).first_or_404()
 
     db.session.delete(goal)
     db.session.commit()
