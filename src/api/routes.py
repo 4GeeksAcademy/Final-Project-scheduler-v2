@@ -16,7 +16,7 @@ from flask import Blueprint, request, jsonify
 from api.utils import generate_sitemap, APIException
 from api.models import db, User, Events
 from flask import Flask, request, jsonify, url_for, Blueprint
-
+from api.models import Goals
 
 api = Blueprint("api", __name__)
 CORS(api)
@@ -378,3 +378,10 @@ def put_user_protected_follows_route(action: str, target_id: int):
 def list_events():
     events = Events.query.order_by(Events.id.desc()).all()
     return jsonify([e.serialize() for e in events]), 200
+
+
+@api.route('/search/<string:search_name>', methods=['GET'])
+def get_search_user_route(search_name: str):
+    user_list = Userdata.query.filter(
+        Userdata.username.ilike(f"%{search_name}%")).all()
+    return jsonify({"search_results": [u.serialize() for u in user_list]}), 200
