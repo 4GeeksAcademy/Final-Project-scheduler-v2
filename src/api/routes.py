@@ -7,21 +7,88 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy import select
-
-from .models import db, Userdata  # User is unused
-
+import requests
+from .models import db, Userdata, Events  # User is unused
+from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_cors import CORS
+from flask import Blueprint, request, jsonify
+from api.utils import generate_sitemap, APIException
+from api.models import db, User, Events
+from flask import Flask, request, jsonify, url_for, Blueprint
+from api.models import Goal
 api = Blueprint("api", __name__)
 CORS(api)
 
 ALLOWED_GENDERS = {"male", "female", "other"}
 
 
+
+
 @api.route("/hello", methods=["GET", "POST"])
 def handle_hello():
     return jsonify({"message": "Hello! I'm a message from the backend. Check your Network tab."}), 200
 
+    return jsonify(response_body), 200
 
+
+# @api.route('/createEvent', methods=['POST'])
+# def post_event_route():
+
+#     # do updating in the database
+#     request_data = request.json
+#     user_id = request_data["host"]
+#     # user = User.query.get(user_id)
+#     new_event = Events(
+#         # fill all this in with the data needed to create an event
+#     )
+#     # db.session.add(new_event)
+#     # db.session.commit()
+#     return jsonify("ok"), 200
+@api.route('/create/event', methods=['POST'])
+@jwt_required()
+def post_event_create_route():
+    request_body = request.json
+    current_user_id = get_jwt_identity()
+    user = db.session.execute(select(Userdata).where(
+        Userdata.id == current_user_id)).scalar_one_or_none()
+
+    new_event = Events(
+        name=request_body["name"],
+        date=request_body["date"],
+        time=request_body["time"],
+        # originally intended to set this to user[timezone] but user doesnt have that field
+        timezone=request_body["timezone"],
+        attendees=[],
+        visibility=request_body["visibility"],
+        host_id=current_user_id,
+        host=user,
+        repeat=request_body["repeat"],
+        description=request_body["description"],
+        timer=request_body["timer"]
+    )
+    db.session.add(new_event)
+    new_event.attendees.append(user)
+    db.session.commit()
+    return jsonify({"createdEvent": new_event.serialize()}), 200
+
+
+@api.route('/editEvent', methods=['PUT'])
+def post_event_route():
+
+    # do updating in the database
+    request_data = request.json
+    event_id = request_data["id"]
+    event = Events.query.get(event_id)
+    event.date = request_data["date"]
+    # do all the other event fields
+
+    # db.session.commit()
+
+    return jsonify("ok"), 200
 # --- List all users (consider adding pagination later) ---
+
+
 @api.route("/users", methods=["GET"])
 def list_users():
     users = Userdata.query.order_by(Userdata.id.desc()).all()
@@ -83,6 +150,25 @@ def signup():
         return jsonify({"error": "username or email already exists"}), 409
 
     return jsonify({"message": "User created successfully", "user": user.serialize()}), 201
+
+# Create a route to authenticate your users and return JWT Token
+
+
+@api.route("/token", methods=["POST"])
+def create_token():
+    data = request.get_json(silent=True) or {}
+    username = (data.get("username") or "").strip()
+    password = data.get("password") or ""
+
+    if not username or not password:
+        return jsonify({"msg": "username and password are required"}), 400
+
+    user = Userdata.query.filter_by(username=username).first()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    token = create_access_token(identity=str(user.id))
+    return jsonify({"token": token, "user_id": user.id, "username": user.username}), 200
 
 
 # --- Login ---
@@ -170,7 +256,7 @@ def get_user_protected_follows_route():
     return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
 
 
-@api.route('/protected/followed/<str:action>/<int:target_id>', methods=['PUT'])
+@api.route('/protected/followed/<string:action>/<int:target_id>', methods=['PUT'])
 @jwt_required()
 def put_user_protected_follows_route(action: str, target_id: int):
     current_user_id = get_jwt_identity()
@@ -184,3 +270,86 @@ def put_user_protected_follows_route(action: str, target_id: int):
         user.followed.remove(target)
     db.session.commit()
     return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
+
+
+@api.route("/events", methods=["GET"])
+def list_events():
+    events = Events.query.order_by(Events.id.desc()).all()
+    return jsonify([e.serialize() for e in events]), 200
+
+
+@api.route('/search/<string:search_name>', methods=['GET'])
+def get_search_user_route(search_name: str):
+    user_list = Userdata.query.filter(
+        Userdata.username.ilike(f"%{search_name}%")).all()
+    return jsonify({"search_results": [u.serialize() for u in user_list]}), 200
+
+
+#-- its me, goals api.routes ---
+
+# Route to get all goals for the current authenticated user
+@api.route("/goals", methods=["GET"])
+@jwt_required()
+def get_goals():
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Query the database for all goals belonging to this user
+    user_goals = Goal.query.filter_by(user_id=current_user_id).all()
+    
+    # Serialize the goals to a list of dictionaries and return them
+    return jsonify({"goals": [goal.serialize() for goal in user_goals]}), 200
+
+# Route to create a new goal for the current authenticated user
+@api.route("/goals", methods=["POST"])
+@jwt_required()
+def add_goal():
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Get goal data from the request body
+    data = request.get_json()
+    new_goal = Goal(
+        text=data['text'],
+        target=data['target'],
+        completions=data['completions'],
+        user_id=current_user_id # Associate the goal with the user
+    )
+
+    db.session.add(new_goal)
+    db.session.commit()
+    return jsonify({"message": "Goal added successfully"}), 201
+
+# Route to update a specific goal
+@api.route("/goals/<int:goal_id>", methods=["PUT"])
+@jwt_required()
+def update_goal(goal_id):
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Find the specific goal by its ID and ensure it belongs to the current user
+    goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first_or_404()
+    
+    # Get the new data from the request body
+    data = request.get_json()
+    
+    # Update the goal's completion count
+    goal.completions = data.get('completions', goal.completions)
+
+    db.session.commit()
+    return jsonify({"message": "Goal updated successfully"}), 200
+
+# Route to delete a specific goal
+
+@api.route("/goals/<int:goal_id>", methods=["DELETE"])
+@jwt_required()
+def delete_goal(goal_id):
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Find the specific goal by its ID and ensure it belongs to the current user
+    goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first_or_404()
+
+    db.session.delete(goal)
+    db.session.commit()
+    return jsonify({"message": "Goal deleted successfully"}), 200

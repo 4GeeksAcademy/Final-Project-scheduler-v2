@@ -35,7 +35,7 @@ export const Navbar = () => {
 								<Link className="nav-link active" to="/">Home</Link>
 							</li>
 							<li className="nav-item">
-								<Link className="nav-link" to="/profile">Profile</Link> 
+								<Link className="nav-link" to="/profile">Profile</Link>
 							</li>
 							<li className="nav-item dropdown">
 								<a
@@ -49,6 +49,7 @@ export const Navbar = () => {
 								</a>
 								<ul className="dropdown-menu">
 									<li><Link className="dropdown-item" to="/goals">Goals</Link></li>
+										<li><Link className="dropdown-item" to="/events">Events</Link></li>
 									<li><Link className="dropdown-item" to="/calendar">Calendar</Link></li>
 									<li><Link className="dropdown-item" to="/friends">Friends</Link></li>
 									<li>
