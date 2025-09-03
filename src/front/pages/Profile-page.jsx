@@ -18,7 +18,6 @@ const getCurrentWeek = (weekOffset = 0) => {
 const ProfilePage = () => {
     const { userId } = useParams();
 
-
     const [name, setName] = useState("Saul");
     const [number, setNumber] = useState("555-123-4567");
     const [email, setEmail] = useState("saul@email.com");
