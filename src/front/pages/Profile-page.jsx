@@ -21,9 +21,9 @@ const ProfilePage = () => {
     const { userId } = useParams();
 
 
-    const [name, setName] = useState("");
-    const [number, setNumber] = useState("");
-    const [email, setEmail] = useState("");
+    const [name, setName] = useState("Saul");
+    const [number, setNumber] = useState("555-123-4567");
+    const [email, setEmail] = useState("saul@email.com");
     const [profilePhoto, setProfilePhoto] = useState(defaultProfilePhoto);
 
 
