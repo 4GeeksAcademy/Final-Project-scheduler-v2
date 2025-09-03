@@ -4,6 +4,7 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
+import SettingsPage from "./pages/settings-page";
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
@@ -25,12 +26,13 @@ export const router = createBrowserRouter(
 
     // Root Route: All navigation will start from here.
 
-   
+
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
       {/* Root shows Login */}
       <Route index element={<Login />} />
 
       {/* Pages */}
+      <Route path="/settings" element={<SettingsPage />} />
       <Route path="/home" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/profile/:userId" element={<ProfilePage />} />
