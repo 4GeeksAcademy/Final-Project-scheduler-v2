@@ -42,12 +42,12 @@ def handle_hello():
 #     )
 #     # db.session.add(new_event)
 #     # db.session.commit()
-
 #     return jsonify("ok"), 200
 @api.route('/create/event', methods=['POST'])
+@jwt_required()
 def post_event_create_route():
     request_body = request.json
-    current_user_id = request_body["user_id"]
+    current_user_id = get_jwt_identity()
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
 
@@ -150,6 +150,8 @@ def signup():
     return jsonify({"message": "User created successfully", "user": user.serialize()}), 201
 
 # Create a route to authenticate your users and return JWT Token
+
+
 @api.route("/token", methods=["POST"])
 def create_token():
     data = request.get_json(silent=True) or {}
@@ -163,7 +165,7 @@ def create_token():
     if not user or not check_password_hash(user.password, password):
         return jsonify({"msg": "Bad username or password"}), 401
 
-    token = create_access_token(identity=user.id)
+    token = create_access_token(identity=str(user.id))
     return jsonify({"token": token, "user_id": user.id, "username": user.username}), 200
 
 
@@ -272,3 +274,10 @@ def put_user_protected_follows_route(action: str, target_id: int):
 def list_events():
     events = Events.query.order_by(Events.id.desc()).all()
     return jsonify([e.serialize() for e in events]), 200
+
+
+@api.route('/search/<string:search_name>', methods=['GET'])
+def get_search_user_route(search_name: str):
+    user_list = Userdata.query.filter(
+        Userdata.username.ilike(f"%{search_name}%")).all()
+    return jsonify({"search_results": [u.serialize() for u in user_list]}), 200
