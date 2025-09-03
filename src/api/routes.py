@@ -16,115 +16,13 @@ from flask import Blueprint, request, jsonify
 from api.utils import generate_sitemap, APIException
 from api.models import db, User, Events
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import Goals
-
+from api.models import Goal
 api = Blueprint("api", __name__)
 CORS(api)
 
 ALLOWED_GENDERS = {"male", "female", "other"}
-TODOIST_API_TOKEN = '740a4c51dae74f7f154910e22d9545e4ac383d78'
-TODOIST_API_URL = 'https://api.todoist.com/rest/v2'
 
 
-def get_todoist_headers():
-    """Returns the HTTP headers required for Todoist API authentication."""
-    return {
-        'Authorization': f'Bearer {TODOIST_API_TOKEN}',
-        'Content-Type': 'application/json'
-    }
-
-
-def map_todoist_tasks_to_goals(tasks):
-
-    goals = []
-    for task in tasks:
-        text = task['content']
-        completions = 0
-        target = 1
-
-        if '(' in text and ')' in text:
-            try:
-                parts = text.split('(')[-1].split(')')[0].split('/')
-                completions = int(parts[0])
-                target = int(parts[1])
-                text = text.split('(')[0].strip()
-            except (ValueError, IndexError):
-                pass
-
-        goals.append({
-            'id': task['id'],
-            'text': text,
-            'completions': completions,
-            'target': target,
-            'addedBy': 'unknown',
-        })
-    return goals
-
-
-@api.route('/goals', methods=['GET'])
-def get_goals():
-    """Endpoint to retrieve all goals from the Todoist API."""
-    try:
-        response = requests.get(
-            f'{TODOIST_API_URL}/tasks', headers=get_todoist_headers())
-        response.raise_for_status()
-        tasks = response.json()
-        goals = map_todoist_tasks_to_goals(tasks)
-        return jsonify(goals)
-    except requests.exceptions.RequestException as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@api.route('/goals', methods=['POST'])
-def add_goal():
-    """Endpoint to add a new goal to the Todoist API."""
-    data = request.json
-    try:
-        new_task_data = {
-            'content': data['text'],
-        }
-        response = requests.post(
-            f'{TODOIST_API_URL}/tasks', headers=get_todoist_headers(), json=new_task_data)
-        response.raise_for_status()
-        new_task = response.json()
-        return jsonify({'id': new_task['id'], 'text': new_task['content'], 'completions': 0, 'target': data['target']}), 201
-    except requests.exceptions.RequestException as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@api.route('/goals/<goal_id>', methods=['PUT'])
-def update_goal(goal_id):
-    """Endpoint to update a specific goal in the Todoist API."""
-    data = request.json
-    try:
-        task_response = requests.get(
-            f'{TODOIST_API_URL}/tasks/{goal_id}', headers=get_todoist_headers())
-        task_response.raise_for_status()
-        current_task = task_response.json()
-
-        new_text = f"{current_task['content'].split('(')[0].strip()} ({data['completions']}/{data['target']})"
-
-        update_response = requests.post(
-            f'{TODOIST_API_URL}/tasks/{goal_id}', headers=get_todoist_headers(), json={'content': new_text})
-        update_response.raise_for_status()
-
-        return jsonify({'id': goal_id, 'completions': data['completions']})
-    except requests.exceptions.RequestException as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@api.route('/goals/<goal_id>', methods=['DELETE'])
-def delete_goal(goal_id):
-    """Endpoint to delete a specific goal from the Todoist API."""
-    try:
-        response = requests.delete(
-            f'{TODOIST_API_URL}/tasks/{goal_id}', headers=get_todoist_headers())
-        response.raise_for_status()
-        return jsonify({'message': 'Goal deleted'}), 200
-    except requests.exceptions.RequestException as e:
-        return jsonify({'error': str(e)}), 500
-
-# --- end of goal page ---
 
 
 @api.route("/hello", methods=["GET", "POST"])
@@ -385,3 +283,73 @@ def get_search_user_route(search_name: str):
     user_list = Userdata.query.filter(
         Userdata.username.ilike(f"%{search_name}%")).all()
     return jsonify({"search_results": [u.serialize() for u in user_list]}), 200
+
+
+#-- its me, goals api.routes ---
+
+# Route to get all goals for the current authenticated user
+@api.route("/goals", methods=["GET"])
+@jwt_required()
+def get_goals():
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Query the database for all goals belonging to this user
+    user_goals = Goal.query.filter_by(user_id=current_user_id).all()
+    
+    # Serialize the goals to a list of dictionaries and return them
+    return jsonify({"goals": [goal.serialize() for goal in user_goals]}), 200
+
+# Route to create a new goal for the current authenticated user
+@api.route("/goals", methods=["POST"])
+@jwt_required()
+def add_goal():
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Get goal data from the request body
+    data = request.get_json()
+    new_goal = Goal(
+        text=data['text'],
+        target=data['target'],
+        completions=data['completions'],
+        user_id=current_user_id # Associate the goal with the user
+    )
+
+    db.session.add(new_goal)
+    db.session.commit()
+    return jsonify({"message": "Goal added successfully"}), 201
+
+# Route to update a specific goal
+@api.route("/goals/<int:goal_id>", methods=["PUT"])
+@jwt_required()
+def update_goal(goal_id):
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Find the specific goal by its ID and ensure it belongs to the current user
+    goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first_or_404()
+    
+    # Get the new data from the request body
+    data = request.get_json()
+    
+    # Update the goal's completion count
+    goal.completions = data.get('completions', goal.completions)
+
+    db.session.commit()
+    return jsonify({"message": "Goal updated successfully"}), 200
+
+# Route to delete a specific goal
+
+@api.route("/goals/<int:goal_id>", methods=["DELETE"])
+@jwt_required()
+def delete_goal(goal_id):
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Find the specific goal by its ID and ensure it belongs to the current user
+    goal = Goal.query.filter_by(id=goal_id, user_id=current_user_id).first_or_404()
+
+    db.session.delete(goal)
+    db.session.commit()
+    return jsonify({"message": "Goal deleted successfully"}), 200
