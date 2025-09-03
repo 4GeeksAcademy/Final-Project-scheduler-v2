@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, JSON
+from sqlalchemy import String, Boolean, ForeignKey, JSON, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 
@@ -126,20 +126,22 @@ class Userdata(db.Model):
         }
 
 
-class Goals(db.Model):
+class Goal(db.Model):
+    """
+    Updated version for goal including completions, target.
+    """
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(unique=False, nullable=False)
-    visibility: Mapped[str] = mapped_column(unique=False, nullable=False)
-    host_id: Mapped[int] = mapped_column(ForeignKey("userdata.id"))
-    host: Mapped["Userdata"] = relationship(
-        back_populates="goals")
-    goalAmount: Mapped[int] = mapped_column(unique=False, nullable=False)
+    text: Mapped[str] = mapped_column(unique=False, nullable=False)
+    target: Mapped[int] = mapped_column(Integer, unique=False, nullable=False)
+    completions: Mapped[int] = mapped_column(Integer, unique=False, nullable=False, default=0)
+    user_id: Mapped[int] = mapped_column(ForeignKey("userdata.id"))
+    user: Mapped["Userdata"] = relationship(back_populates="goals")
 
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
-            "visibility": self.visibility,
-            "host": self.host,
-            "goalAmount": self.goalAmount
+            "text": self.text,
+            "target": self.target,
+            "completions": self.completions,
+            "user_id": self.user_id,
         }
