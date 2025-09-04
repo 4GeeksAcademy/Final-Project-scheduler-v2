@@ -14,18 +14,10 @@ export const CreateEvent = () => {
     const [eventData, setEventData] = useState({
         "date": "",
         "name": "",
-<<<<<<< HEAD
-        "user_id": 1,
-        "time": "",
-        "timezone": "",
-        "attendees": [],
-        "visibility": "public",
-=======
         "time": "",
         "timezone": "",
         "attendees": [],
         "visibility": "Private",
->>>>>>> 115202db0426e766988481d87c4765993e101935
         "repeat": {}, //maybe have this look like an object? thinking it'll look like 
         "description": "",
         "timer": { hours: 0, minutes: 0, seconds: 0 }
