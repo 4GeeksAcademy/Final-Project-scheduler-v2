@@ -373,6 +373,8 @@ def delete_goal(goal_id):
 
 @api.route("/events/<int:eventId>", methods=["GET"])
 def eventdetails (eventId):
-    events = Events.query.filter_by(
-        id=eventId)
-    return jsonify({"returned_event": events}), 200
+    events = Events.query.filter(Events.id == eventId).first()
+    part_one= events.serialize()
+    part_two= events.serialize_attendees()
+    combined= part_one | part_two
+    return jsonify({"returned_event": combined}), 200
