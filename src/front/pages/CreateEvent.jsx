@@ -14,11 +14,18 @@ export const CreateEvent = () => {
     const [eventData, setEventData] = useState({
         "date": "",
         "name": "",
+<<<<<<< HEAD
         "user_id": 1,
         "time": "",
         "timezone": "",
         "attendees": [],
         "visibility": "public",
+=======
+        "time": "",
+        "timezone": "",
+        "attendees": [],
+        "visibility": "Private",
+>>>>>>> 115202db0426e766988481d87c4765993e101935
         "repeat": {}, //maybe have this look like an object? thinking it'll look like 
         "description": "",
         "timer": { hours: 0, minutes: 0, seconds: 0 }
@@ -78,20 +85,21 @@ export const CreateEvent = () => {
                     "timer": timer
                 }
             });
-            console.log(eventData);
-            setEventData((oldEventData) => {
-                return {
-                    ...oldEventData,
-                    "user_id": 1
-                }
-            });
-            ////////////////////////ONLY MISSING THE FETCH!!!!!!!!!!!!!!!!! NEEDS TO RESOLVE HOW TO ACCESS USER ID FIRST
-            await fetch(`${API_URL}api/create/event`, {
+            console.log("eventData: ", eventData)
+
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}api/create/event`, {
                 method: "POST",
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
                 body: JSON.stringify(eventData)
             });
-            navigate('/profile/1');
+            const eventObj = await response.json();
+            let user_id = eventObj["createdEvent"]["host_id"]
+            console.log(eventObj)
+            navigate(`/profile/${user_id}`);
             alert("Event Created!");
         }
 

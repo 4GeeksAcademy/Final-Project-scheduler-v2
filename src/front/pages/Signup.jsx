@@ -24,7 +24,6 @@ export const Signup = () => {
       return;
     }
 
-    // ✅ Custom check for gender
     if (gender === "") {
       setErrorMsg("Please select a gender");
       return;
@@ -63,7 +62,7 @@ export const Signup = () => {
           setPassword("");
           setGender("");
           setTimeout(() => {
-            navigate("/Login");
+            navigate("/", { replace: true });
           }, 1500);
         }
       })
@@ -217,7 +216,7 @@ export const Signup = () => {
         <div className="card-footer bg-light border-0 text-center py-3">
           <span className="text-muted">Already have an account?</span>
           <Link
-            to="/Login"
+            to="/"
             className="btn btn-outline-primary btn-sm ms-2 rounded-pill"
           >
             Sign in

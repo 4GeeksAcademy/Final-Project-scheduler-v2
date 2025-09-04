@@ -1,21 +1,21 @@
+import { useEffect, useState } from "react";
 import Timer from "../components/Timer";
+import { useParams } from "react-router-dom";
 
-export default function EventDetails() {
-  const mockEvent = {
-    id: 1,
-    title: "Study Group Session",
-    date: "8/22/25",
-    name: "Haley",
-    time: "10am", // make a fetch call, set fetch= *some variable* replace mockevent with whatever i store the fetch request with -HALEY notes for later!
-    timezone: "EST",
-    attendees: ["Haley", "Connor", "Rudy"],
-    visibility: "public",
-    host: "Haley",
-    repeat: "weekly",
-    description: "Weekly study group for learning Python",
-    timer: "00:30:00",
-    color: "#3B82F6" 
-  };
+const API_URL = import.meta.env.VITE_BACKEND_URL
+
+export default function EventDetails () {
+  const [event, setEvent] = useState(null);
+  const { eventId } = useParams();
+  async function fetchevent(){
+    const response = await fetch(`${API_URL}/api/events/${eventId}`)
+    setEvent(response.returned_events)
+  }
+  useEffect ( () => {
+    fetchevent()
+  }, []);
+
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 pt-16">

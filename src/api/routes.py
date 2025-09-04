@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy import select
-
 from .models import db, Userdata, Events  # User is unused
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,9 +15,7 @@ from flask import Blueprint, request, jsonify
 from api.utils import generate_sitemap, APIException
 from api.models import db, User, Events
 from flask import Flask, request, jsonify, url_for, Blueprint
-from datetime import datetime, date
-
-
+from api.models import Goal
 api = Blueprint("api", __name__)
 CORS(api)
 
@@ -44,22 +41,14 @@ def handle_hello():
 #     )
 #     # db.session.add(new_event)
 #     # db.session.commit()
-
 #     return jsonify("ok"), 200
 @api.route('/create/event', methods=['POST'])
+@jwt_required()
 def post_event_create_route():
     request_body = request.json
-    current_user_id = request_body["user_id"]
+    current_user_id = get_jwt_identity()
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
-    event_date = None
-   
-
-    # On the backend, datetime.strptime(time_str, "%H:%M").time() converts it into a time object SQLAlchemy can store.
-    # When returning the event, you can convert it back to "HH:MM" with .strftime("%H:%M")
-
-    # Convert string to datetime.time
-   
 
     new_event = Events(
         name=request_body["name"],
@@ -103,7 +92,20 @@ def list_users():
     return jsonify([u.serialize() for u in users]), 200
 
 
+@api.route("/usersGoals", methods=["GET"])
+def list_users_goals():
+    users = Userdata.query.order_by(Userdata.id.desc()).all()
+    return jsonify([u.serialize_user_goals() for u in users]), 200
+
+
+@api.route("/usersEvents", methods=["GET"])
+def list_users_events():
+    users = Userdata.query.order_by(Userdata.id.desc()).all()
+    return jsonify([u.serialize_user_events() for u in users]), 200
+
 # --- Get one user by id ---
+
+
 @api.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id: int):
     user = db.session.get(Userdata, user_id)  # SQLAlchemy 2.x style
@@ -158,6 +160,25 @@ def signup():
         return jsonify({"error": "username or email already exists"}), 409
 
     return jsonify({"message": "User created successfully", "user": user.serialize()}), 201
+
+# Create a route to authenticate your users and return JWT Token
+
+
+@api.route("/token", methods=["POST"])
+def create_token():
+    data = request.get_json(silent=True) or {}
+    username = (data.get("username") or "").strip()
+    password = data.get("password") or ""
+
+    if not username or not password:
+        return jsonify({"msg": "username and password are required"}), 400
+
+    user = Userdata.query.filter_by(username=username).first()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    token = create_access_token(identity=str(user.id))
+    return jsonify({"token": token, "user_id": user.id, "username": user.username}), 200
 
 
 # --- Login ---
@@ -265,3 +286,93 @@ def put_user_protected_follows_route(action: str, target_id: int):
 def list_events():
     events = Events.query.order_by(Events.id.desc()).all()
     return jsonify([e.serialize() for e in events]), 200
+
+
+@api.route('/search/<string:search_name>', methods=['GET'])
+def get_search_user_route(search_name: str):
+    user_list = Userdata.query.filter(
+        Userdata.username.ilike(f"%{search_name}%")).all()
+    return jsonify({"search_results": [u.serialize() for u in user_list]}), 200
+
+
+# -- its me, goals api.routes ---
+
+# Route to get all goals for the current authenticated user
+@api.route("/goals", methods=["GET"])
+@jwt_required()
+def get_goals():
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Query the database for all goals belonging to this user
+    user_goals = Goal.query.filter_by(user_id=current_user_id).all()
+
+    # Serialize the goals to a list of dictionaries and return them
+    return jsonify({"goals": [goal.serialize() for goal in user_goals]}), 200
+
+# Route to create a new goal for the current authenticated user
+
+
+@api.route("/goals", methods=["POST"])
+@jwt_required()
+def add_goal():
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Get goal data from the request body
+    data = request.get_json()
+    new_goal = Goal(
+        text=data['text'],
+        target=data['target'],
+        completions=data['completions'],
+        user_id=current_user_id  # Associate the goal with the user
+    )
+
+    db.session.add(new_goal)
+    db.session.commit()
+    return jsonify({"message": "Goal added successfully"}), 201
+
+# Route to update a specific goal
+
+
+@api.route("/goals/<int:goal_id>", methods=["PUT"])
+@jwt_required()
+def update_goal(goal_id):
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Find the specific goal by its ID and ensure it belongs to the current user
+    goal = Goal.query.filter_by(
+        id=goal_id, user_id=current_user_id).first_or_404()
+
+    # Get the new data from the request body
+    data = request.get_json()
+
+    # Update the goal's completion count
+    goal.completions = data.get('completions', goal.completions)
+
+    db.session.commit()
+    return jsonify({"message": "Goal updated successfully"}), 200
+
+# Route to delete a specific goal
+
+
+@api.route("/goals/<int:goal_id>", methods=["DELETE"])
+@jwt_required()
+def delete_goal(goal_id):
+    # Get the ID of the currently logged-in user
+    current_user_id = get_jwt_identity()
+
+    # Find the specific goal by its ID and ensure it belongs to the current user
+    goal = Goal.query.filter_by(
+        id=goal_id, user_id=current_user_id).first_or_404()
+
+    db.session.delete(goal)
+    db.session.commit()
+    return jsonify({"message": "Goal deleted successfully"}), 200
+
+@api.route("/events/<int:eventId>", methods=["GET"])
+def eventdetails (eventId):
+    events = Events.query.filter_by(
+        id=eventId)
+    return jsonify({"returned_event": events}), 200
