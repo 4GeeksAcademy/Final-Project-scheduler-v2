@@ -88,6 +88,7 @@ def post_event_route():
 
 # --- List all users (consider adding pagination later) ---
 
+
 @api.route("/users", methods=["GET"])
 def list_users():
     users = Userdata.query.order_by(Userdata.id.desc()).all()
@@ -107,6 +108,7 @@ def list_users_events():
 
 # --- Get one user by id ---
 
+
 @api.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id: int):
     user = db.session.get(Userdata, user_id)  # SQLAlchemy 2.x style
@@ -116,11 +118,13 @@ def get_user(user_id: int):
 
   # reuse the same function you wrote for /signup
 
+
 @api.route("/users", methods=["POST"])
 def create_user():
     return signup()
 
 # --- Sign up (create user) ---
+
 
 @api.route("/signup", methods=["POST"])
 def signup():
@@ -162,6 +166,7 @@ def signup():
 
 # Create a route to authenticate your users and return JWT Token
 
+
 @api.route("/token", methods=["POST"])
 def create_token():
     data = request.get_json(silent=True) or {}
@@ -175,13 +180,15 @@ def create_token():
     if not user or not check_password_hash(user.password, password):
         return jsonify({"msg": "Bad username or password"}), 401
 
-    token = create_access_token(identity=str(user.id))  # <-- identity as string
+    token = create_access_token(identity=str(
+        user.id))  # <-- identity as string
     return jsonify({"token": token, "user_id": user.id, "username": user.username}), 200
+
 
 @api.route("/me", methods=["GET"])
 @jwt_required()
 def me():
-    user_id = int(get_jwt_identity())          
+    user_id = int(get_jwt_identity())
     user = db.session.get(Userdata, user_id)
     if not user:
         return jsonify({"msg": "User not found"}), 404
@@ -282,11 +289,20 @@ def put_user_protected_follows_route(action: str, target_id: int):
     target = db.session.execute(select(Userdata).where(
         Userdata.id == target_id)).scalar_one_or_none()
     if action == "add":
+        if len(user.serialize_followed()) == 0:
+            filtered_list = []
+        else:
+            listings = user.serialize_followed()["followed"]
+            print(listings)
+            filtered_list = list(
+                filter(lambda friend: friend["id"] == target.id, user.serialize_followed()["followed"]))
+        if len(filtered_list) > 0:
+            return jsonify({"id": user.id, "followed": user.serialize_followed(), "status": "dupe"}), 200
         user.followed.append(target)
     elif action == "remove":
         user.followed.remove(target)
     db.session.commit()
-    return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
+    return jsonify({"id": user.id, "followed": user.serialize_followed(), "status": "good"}), 200
 
 
 @api.route("/events", methods=["GET"])
@@ -319,6 +335,7 @@ def get_goals():
 
 # Route to create a new goal for the current authenticated user
 
+
 @api.route("/goals", methods=["POST"])
 @jwt_required()
 def add_goal():
@@ -340,6 +357,7 @@ def add_goal():
 
 # Route to update a specific goal
 
+
 @api.route("/goals/<int:goal_id>", methods=["PUT"])
 @jwt_required()
 def update_goal(goal_id):
@@ -360,6 +378,7 @@ def update_goal(goal_id):
     return jsonify({"message": "Goal updated successfully"}), 200
 
 # Route to delete a specific goal
+
 
 @api.route("/goals/<int:goal_id>", methods=["DELETE"])
 @jwt_required()

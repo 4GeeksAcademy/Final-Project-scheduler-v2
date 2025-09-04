@@ -20,6 +20,28 @@ export function UserSearch() {
         setSearched(true)
     }
 
+    async function followButton(target_id) {
+        if (!localStorage.getItem('token')) {
+            alert("Log in to Follow users!")
+        } else {
+            const rawResponse = await fetch(`${API_URL}api/protected/followed/add/${target_id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            });
+
+            const data = await rawResponse.json()
+            console.log("processed fetch response: ", data)
+            if (data.status === "dupe") {
+                alert("You have already followed this user! (remove followed users from your Following page)")
+            } else {
+                alert("User Followed!")
+            }
+        }
+    }
+
     useEffect(() => {
         if (input === "") {
             setSearched(false)
@@ -27,9 +49,22 @@ export function UserSearch() {
     }, [result]);
 
     let resultWindow = result.map((user, index) => (
-        <div key={index} className="card p-5 shadow-sm rounded-3 mb-3" style={{ maxWidth: "500px", width: "70%" }}>
-            <Link to={`/profile/${user.id}`}><span>{user.username}</span></Link>
+        <div key={index} className="card p-5 shadow-sm rounded-3 mb-3" style={{ maxWidth: "500px" }}>
+            <div className="row">
+                <div className="col d-flex flex-column">
+                    <span>Username:</span>
+                    <span className="p-2 fs-5">{user.username}</span>
+                </div>
+                <div className="col d-flex flex-column">
+                    <span>Name:</span>
+                    <span className="p-2 fs-5">{user.first_name + " " + user.last_name}</span>
+                </div>
 
+            </div>
+            <span className="text-center">
+                <Link to={`/profile/${user.id}`}><button className="mt-3 btn btn-secondary rounded-pill me-2">Profile</button></Link>
+                <button className="mt-3 btn btn-dark rounded-pill" onClick={() => followButton(user.id)}>Follow</button>
+            </span>
         </div>
     ));
 

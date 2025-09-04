@@ -49,9 +49,9 @@ export const Navbar = () => {
 								</a>
 								<ul className="dropdown-menu">
 									<li><Link className="dropdown-item" to="/goals">Goals</Link></li>
-										<li><Link className="dropdown-item" to="/events">Events</Link></li>
+									<li><Link className="dropdown-item" to="/events">Events</Link></li>
 									<li><Link className="dropdown-item" to="/calendar">Calendar</Link></li>
-									<li><Link className="dropdown-item" to="/friends">Friends</Link></li>
+									<li><Link className="dropdown-item" to="/favoritesList">Friends</Link></li>
 									<li>
 										<hr className="dropdown-divider" />
 									</li>
