@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
@@ -19,36 +20,42 @@ export const FavoritesList = () => {
     ]); // making fake Favorites objects
     const [loaded, setLoaded] = useState(false);
 
-    useEffect(async () => {
-        //insert some bs about aking a fetch call to the Database for a list of user's Favorites (probably a protected view)
-        // Retrieve token from localStorage
+    async function loadFriends() {
         const token = localStorage.getItem('token');
-        const userdata = await fetch(`${API_URL}protected/followed`, {
+        const rawData = await fetch(`${API_URL}api/protected/followed`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 'Authorization': 'Bearer ' + token
             }
         });
+        const userdata = await rawData.json()
+        console.log("userdata from fetch", userdata.followed.followed)
         setLoaded(true);
-        setFavoritesList(userdata.followed);
+        setFavoritesList(userdata.followed.followed);
+    }
 
-    }, [favoritesList]);
+    useEffect(() => {
+        //insert some bs about aking a fetch call to the Database for a list of user's Favorites (probably a protected view)
+        // Retrieve token from localStorage
+        loadFriends();
+
+    }, []);
 
     async function removeFriend(target_id) {
         // database fetch to remove friend
         setLoaded(false);
         const token = localStorage.getItem('token');
-        const userdata = await fetch(`${API_URL}protected/followed/remove/${target_id}`, {
+        const rawData = await fetch(`${API_URL}api/protected/followed/remove/${target_id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 'Authorization': 'Bearer ' + token
             }
         });
+        const userdata = await rawData.json()
         setLoaded(true);
-        setFavoritesList(userdata.followed);
-        alert("function works") // remove this when the actual fetch is made
+        setFavoritesList(userdata.followed.followed);
     }
 
     function searchFavorites() {
@@ -58,13 +65,13 @@ export const FavoritesList = () => {
 
     let listedFavorites = favoritesList.map((friend, index) => (
         <tr key={index}>
-            <td>{`${friend["FirstName"]} ${friend["LastName"]}`}</td>
-            <td><Link to={`/profile/${friend["id"]}`}><button>View Profile</button></Link></td>
-            <td><button onClick={() => removeFriend(friend.id)}>Remove</button></td>
+            <td>{`${friend["first_name"]} ${friend["last_name"]}`}</td>
+            <td><Link to={`/profile/${friend["id"]}`}><button className="btn btn-dark rounded-pill">View Profile</button></Link></td>
+            <td><button className="btn btn-dark rounded-pill" onClick={() => removeFriend(friend.id)}>Remove</button></td>
         </tr>));
 
     return (
-        <div className="container-fluid bg-success">
+        <div className="container-fluid bg-success mt-5">
             {/* <div className="row d-flex justify-content-center">
                 <div className="col-5 mt-5">
                     <div className="input-group mb-3">
