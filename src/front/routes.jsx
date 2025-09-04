@@ -17,6 +17,7 @@ import Login from "./pages/Login.jsx";
 import EventDetails from "./pages/EventDetails.jsx";
 import GoalTracker from "./pages/Goals-page.jsx";
 import { UserSearch } from "./components/UserSearch.jsx";
+import EventList from "./pages/EventList.jsx"
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -45,6 +46,8 @@ export const router = createBrowserRouter(
       <Route path="/profile/:userId" element={<ProfilePage />} />
       <Route path="/create/event" element={<CreateEvent />} />
       <Route path="/events/:eventId" element={<EventDetails />} />
+      <Route path="/eventlist/:userId" element={<EventList />} />
+
       <Route path="/favoritesList" element={<FavoritesList />} />
       <Route path="/searchTest" element={<UserSearch />} />
     </Route >

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
-export default function EventDetails () {
+export default function EventDetails() {
   const [event, setEvent] = useState({
     id: 1,
     title: "",
@@ -18,13 +18,13 @@ export default function EventDetails () {
     timer: ""
   });
   const { eventId } = useParams();
-  async function fetchevent(){
+  async function fetchevent() {
     const response = await fetch(`${API_URL}api/events/${eventId}`)
-    const data= await response.json();
-     console.log("event: ", data)
+    const data = await response.json();
+    console.log("event: ", data)
     setEvent(data.returned_event)
   }
-  useEffect ( () => {
+  useEffect(() => {
     fetchevent()
   }, []);
 
@@ -39,7 +39,7 @@ export default function EventDetails () {
         style={{ backgroundColor: "red" }}
       >
         {/* Title + Host */}
-        <h1 className="text-2xl font-bold mb-1">{event.name}</h1> 
+        <h1 className="text-2xl font-bold mb-1">{event.name}</h1>
         <p className="text-gray-500 text-sm mb-4">
           👤 Hosted by <strong>{event.host}</strong>
         </p>
@@ -49,7 +49,7 @@ export default function EventDetails () {
           <p>📅 <strong>Date:</strong> {event.date}</p>
           <p>⏰ <strong>Time:</strong> {event.time} {event.timezone}</p>
           <p>🌍 <strong>Visibility:</strong> {event.visibility}</p>
-          <p>🔁 <strong>Repeat:</strong> {event.repeat == {} ?(<span></span>):"yes"}</p>
+          <p>🔁 <strong>Repeat:</strong> {event.repeat == {} ? (<span></span>) : "yes"}</p>
 
           <div>
             🧑‍🤝‍🧑 <strong>Attendees:</strong>
@@ -67,6 +67,7 @@ export default function EventDetails () {
 
           <div>
             ⏳ <strong>Timer:</strong> <Timer initialTime={1800} />
+            {/* need to fix timer */}
           </div>
         </div>
       </div>

@@ -378,3 +378,14 @@ def eventdetails (eventId):
     part_two= events.serialize_attendees()
     combined= part_one | part_two
     return jsonify({"returned_event": combined}), 200
+
+@api.route("/eventlist/<int:userId>", methods=["GET"])
+def userevents(userId):
+    events = Events.query.filter(Events.host_id == userId).all()
+    returned_events = []
+    for event in events:
+        part_one = event.serialize()
+        part_two = event.serialize_attendees()
+        combined = part_one | part_two
+        returned_events.append(combined)
+    return jsonify({"returned_event": returned_events}), 200
