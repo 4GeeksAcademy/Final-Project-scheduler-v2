@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+// trim trailing slash
+const API_URL = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
 const getCurrentWeek = (weekOffset = 0) => {
     const today = new Date();
@@ -20,12 +21,11 @@ const getCurrentWeek = (weekOffset = 0) => {
 const ProfilePage = () => {
     const { userId } = useParams();
 
-
-    const [name, setName] = useState("Saul");
-    const [number, setNumber] = useState("555-123-4567");
-    const [email, setEmail] = useState("saul@email.com");
+    // empty by default so nothing flashes
+    const [name, setName] = useState("");
+    const [number, setNumber] = useState("");
+    const [email, setEmail] = useState("");
     const [profilePhoto, setProfilePhoto] = useState(defaultProfilePhoto);
-
 
     const [holidays, setHolidays] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -67,11 +67,17 @@ const ProfilePage = () => {
         if (!userId) return; // Don't fetch if no userId in URL
         const fetchUser = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/user/${userId}`);
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API_URL}/api/users/${userId}`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
                 if (!res.ok) throw new Error("Failed to fetch user");
                 const data = await res.json();
                 setName(`${data.first_name} ${data.last_name}`);
                 setEmail(data.email);
+                // if you later return these, they'll fill in automatically
+                // if (data.phone) setNumber(data.phone);
+                // if (data.profile_photo_url) setProfilePhoto(data.profile_photo_url);
             } catch (err) {
                 console.error(err);
             }
@@ -84,8 +90,6 @@ const ProfilePage = () => {
         holidaysByDate[holiday.date.iso] = holidaysByDate[holiday.date.iso] || [];
         holidaysByDate[holiday.date.iso].push(holiday.name);
     });
-
-
 
     return (
         <div
@@ -116,7 +120,9 @@ const ProfilePage = () => {
                     }}
                 >
                     {/* Heading above photo */}
-                    <h1 style={{ marginBottom: "24px" }}>{name}'s Page</h1>
+                    <h1 style={{ marginBottom: "24px" }}>
+                        {name ? `${name}'s Page` : ""}
+                    </h1>
 
                     {/* Circular photo placeholder - larger size? */}
                     <div
@@ -148,12 +154,8 @@ const ProfilePage = () => {
 
                     {/* Profile info section */}
                     <div>
-                        <p>
-                            Number: {number}
-                        </p>
-                        <p>
-                            Email: {email}
-                        </p>
+                        <p>Number: {number}</p>
+                        <p>Email: {email}</p>
                     </div>
                 </div>
                 {/* profile box */}
@@ -288,6 +290,8 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
+
 
 
 

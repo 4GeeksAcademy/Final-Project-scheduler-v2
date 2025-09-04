@@ -16,6 +16,7 @@ from api.utils import generate_sitemap, APIException
 from api.models import db, User, Events
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import Goal
+
 api = Blueprint("api", __name__)
 CORS(api)
 
@@ -42,11 +43,12 @@ def handle_hello():
 #     # db.session.add(new_event)
 #     # db.session.commit()
 #     return jsonify("ok"), 200
+
 @api.route('/create/event', methods=['POST'])
 @jwt_required()
 def post_event_create_route():
     request_body = request.json
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())  # <-- cast to int
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
 
@@ -80,11 +82,11 @@ def post_event_route():
     event.date = request_data["date"]
     # do all the other event fields
 
-    # db.session.commit()
+    db.session.commit()  # <-- ensure changes persist
 
     return jsonify("ok"), 200
-# --- List all users (consider adding pagination later) ---
 
+# --- List all users (consider adding pagination later) ---
 
 @api.route("/users", methods=["GET"])
 def list_users():
@@ -105,7 +107,6 @@ def list_users_events():
 
 # --- Get one user by id ---
 
-
 @api.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id: int):
     user = db.session.get(Userdata, user_id)  # SQLAlchemy 2.x style
@@ -115,13 +116,11 @@ def get_user(user_id: int):
 
   # reuse the same function you wrote for /signup
 
-
 @api.route("/users", methods=["POST"])
 def create_user():
     return signup()
 
 # --- Sign up (create user) ---
-
 
 @api.route("/signup", methods=["POST"])
 def signup():
@@ -163,7 +162,6 @@ def signup():
 
 # Create a route to authenticate your users and return JWT Token
 
-
 @api.route("/token", methods=["POST"])
 def create_token():
     data = request.get_json(silent=True) or {}
@@ -177,8 +175,17 @@ def create_token():
     if not user or not check_password_hash(user.password, password):
         return jsonify({"msg": "Bad username or password"}), 401
 
-    token = create_access_token(identity=str(user.id))
+    token = create_access_token(identity=str(user.id))  # <-- identity as string
     return jsonify({"token": token, "user_id": user.id, "username": user.username}), 200
+
+@api.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    user_id = int(get_jwt_identity())          
+    user = db.session.get(Userdata, user_id)
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+    return jsonify(user.serialize()), 200
 
 
 # --- Login ---
@@ -260,7 +267,7 @@ def delete_user(user_id: int):
 @api.route('/protected/followed', methods=['GET'])
 @jwt_required()
 def get_user_protected_follows_route():
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())  # <-- cast to int
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
     return jsonify({"id": user.id, "followed": user.serialize_followed()}), 200
@@ -269,7 +276,7 @@ def get_user_protected_follows_route():
 @api.route('/protected/followed/<string:action>/<int:target_id>', methods=['PUT'])
 @jwt_required()
 def put_user_protected_follows_route(action: str, target_id: int):
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())  # <-- cast to int
     user = db.session.execute(select(Userdata).where(
         Userdata.id == current_user_id)).scalar_one_or_none()
     target = db.session.execute(select(Userdata).where(
@@ -302,7 +309,7 @@ def get_search_user_route(search_name: str):
 @jwt_required()
 def get_goals():
     # Get the ID of the currently logged-in user
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())  # <-- cast to int
 
     # Query the database for all goals belonging to this user
     user_goals = Goal.query.filter_by(user_id=current_user_id).all()
@@ -312,19 +319,18 @@ def get_goals():
 
 # Route to create a new goal for the current authenticated user
 
-
 @api.route("/goals", methods=["POST"])
 @jwt_required()
 def add_goal():
     # Get the ID of the currently logged-in user
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())  # <-- cast to int
 
     # Get goal data from the request body
     data = request.get_json()
     new_goal = Goal(
         text=data['text'],
         target=data['target'],
-        completions=data['completions'],
+        completions=data.get('completions', 0),
         user_id=current_user_id  # Associate the goal with the user
     )
 
@@ -334,12 +340,11 @@ def add_goal():
 
 # Route to update a specific goal
 
-
 @api.route("/goals/<int:goal_id>", methods=["PUT"])
 @jwt_required()
 def update_goal(goal_id):
     # Get the ID of the currently logged-in user
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())  # <-- cast to int
 
     # Find the specific goal by its ID and ensure it belongs to the current user
     goal = Goal.query.filter_by(
@@ -356,12 +361,11 @@ def update_goal(goal_id):
 
 # Route to delete a specific goal
 
-
 @api.route("/goals/<int:goal_id>", methods=["DELETE"])
 @jwt_required()
 def delete_goal(goal_id):
     # Get the ID of the currently logged-in user
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())  # <-- cast to int
 
     # Find the specific goal by its ID and ensure it belongs to the current user
     goal = Goal.query.filter_by(
