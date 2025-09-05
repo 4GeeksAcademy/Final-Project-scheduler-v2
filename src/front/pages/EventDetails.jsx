@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Timer from "../components/Timer";
 import { useParams } from "react-router-dom";
 
+
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
 export default function EventDetails() {
@@ -31,6 +32,7 @@ export default function EventDetails() {
   // MAKE SURE TO ADD COLOR TO THE BOOK- HALEY 
 
 
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 pt-16">
       {/* Event Card */}
@@ -51,7 +53,7 @@ export default function EventDetails() {
           <p>🌍 <strong>Visibility:</strong> {event.visibility}</p>
           <p>🔁 <strong>Repeat:</strong> {event.repeat == {} ? (<span></span>) : "yes"}</p>
 
-          <div>
+          <div> 
             🧑‍🤝‍🧑 <strong>Attendees:</strong>
             <ul className="list-disc list-inside ml-5 text-gray-700">
               {event.attendees.map((person, i) => (

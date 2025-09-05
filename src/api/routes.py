@@ -389,3 +389,27 @@ def userevents(userId):
         combined = part_one | part_two
         returned_events.append(combined)
     return jsonify({"returned_event": returned_events}), 200
+
+@api.route("/attendingeventlist/<int:userId>", methods=["GET"])
+def userattendingevents (userId):
+    user = Userdata.query.get(userId)
+    returned_events = []
+    for event in user.attending_events_list:
+        part_one = event.serialize()
+        part_two = event.serialize_attendees()
+        combined = part_one | part_two
+        returned_events.append(combined)
+    return jsonify({"returned_event": returned_events}), 200
+
+# @api.route("/eventtype/<string:type_name>/color", methods=["PUT"])
+# def update_event_type_color(type_name):
+#     event_type = EventType.query.filter_by(name=type_name).first()
+#     if not event_type:
+#         return jsonify({"error": "Event type not found"}), 404
+
+#     data = request.get_json()
+#     event_type.color = data.get("color")
+#     db.session.commit()
+
+#     return jsonify({"name": event_type.name, "color": event_type.color}), 200
+
