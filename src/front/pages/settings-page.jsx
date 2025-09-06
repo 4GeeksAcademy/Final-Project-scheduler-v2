@@ -3,34 +3,51 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
+function parseJwt(token) {
+    try {
+        return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+        return null;
+    }
+}
+
 const SettingsPage = () => {
     const navigate = useNavigate();
-    const userId = 1; // Hardcoded user ID
+    // userId from localStorage
+    // const userId = localStorage.getItem("user_id");
+    const [userId, setUserId] = useState(null);
 
     const [name, setName] = useState("");
-    const [number, setNumber] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [profilePhoto, setProfilePhoto] = useState(null);
 
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState("");
-    const [editNumber, setEditNumber] = useState("");
     const [editEmail, setEditEmail] = useState("");
     const [editPhoto, setEditPhoto] = useState(null);
 
-    // New: Profile visibility state
     const [isPublic, setIsPublic] = useState(true);
     const [editIsPublic, setEditIsPublic] = useState(isPublic);
 
-    // Fetch user data from backend
+    const [errorMsg, setErrorMsg] = useState("");
+
+    // User data from backend
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/user/${userId}`);
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API_URL}/api/me`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 if (!res.ok) throw new Error("Failed to fetch user");
                 const data = await res.json();
-                setName(`${data.first_name} ${data.last_name}`);
+                setUserId(data.id);
+                setName(`${data.first_name}`);
                 setEditName(`${data.first_name} ${data.last_name}`);
+                setLastName(data.last_name);
                 setEmail(data.email);
                 setEditEmail(data.email);
                 // Set other fields as needed
@@ -39,7 +56,7 @@ const SettingsPage = () => {
             }
         };
         fetchUser();
-    }, [userId]);
+    }, []);
 
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
@@ -50,18 +67,52 @@ const SettingsPage = () => {
         }
     };
 
-    const handleSave = () => {
-        setName(editName);
-        setNumber(editNumber);
-        setEmail(editEmail);
-        setProfilePhoto(editPhoto);
-        setIsPublic(editIsPublic);
-        setIsEditing(false);
+    const handleSave = async () => {
+        setErrorMsg("");
+        try {
+            const [first_name, ...last_name] = editName.trim().split(" ");
+            const updatedUser = {
+                first_name: name,
+                last_name: lastName,
+                email: email,
+                is_public: editIsPublic,
+                // Does backend support photo?
+                //...(editPhoto && { profile_photo: editPhoto }),
+            };
+
+            const token = localStorage.getItem("token");
+            const res = await fetch(`${API_URL}/api/users/${userId}`, { // <-- plural 'users'
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token && { Authorization: `Bearer ${token}` })
+                },
+                body: JSON.stringify(updatedUser),
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                setErrorMsg(errData.msg || "Failed to update user");
+                return;
+            }
+            console.log("name:", name);
+
+            const data = await res.json();
+            setName(`${data.first_name} ${data.last_name}`);
+            setEmail(data.email);
+            setIsPublic(data.is_public);
+            setProfilePhoto(data.profile_photo || null);
+            setIsEditing(false);
+
+            navigate(`/profile/${userId}`);
+        } catch (err) {
+            setErrorMsg("Failed to update user");
+            console.error(err);
+        }
     };
 
     const handleCancel = () => {
         setEditName(name);
-        setEditNumber(number);
         setEditEmail(email);
         setEditPhoto(profilePhoto);
         setEditIsPublic(isPublic);
@@ -74,46 +125,82 @@ const SettingsPage = () => {
             <button onClick={() => navigate(`/profile/${userId}`)} style={{ marginBottom: "20px" }}>
                 Back to Profile
             </button>
+
+            <div style={{ marginBottom: "20px" }}>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={isPublic}
+                        onChange={async (e) => {
+                            const newValue = e.target.checked;
+                            setIsPublic(newValue);
+
+                            try {
+                                const token = localStorage.getItem("token");
+                                await fetch(`${API_URL}/api/users/${userId}`, {
+                                    method: "PATCH",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        ...(token && { Authorization: `Bearer ${token}` })
+                                    },
+                                    body: JSON.stringify({ is_public: newValue }),
+                                });
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        }}
+                        style={{ marginRight: "8px" }}
+                    />
+                    Make my profile public (others can see your profile box and progress bars)
+                </label>
+            </div>
+
             {!isEditing ? (
                 <button onClick={() => setIsEditing(true)}>Edit Profile</button>
             ) : (
-                <div>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        minHeight: "400px",
+                        height: "60vh",
+                        justifyContent: "flex-start",
+                        position: "relative"
+                    }}
+                >
+                    {/* ...edit boxes... */}
                     <div>
                         <label>Name:</label>
-                        <input value={editName} onChange={e => setEditName(e.target.value)} />
+                        <input value={name} onChange={e => setName(e.target.value)} />
                     </div>
                     <div>
-                        <label>Number:</label>
-                        <input value={editNumber} onChange={e => setEditNumber(e.target.value)} />
+                        <label>Last Name:</label>
+                        <input value={lastName} onChange={e => setLastName(e.target.value)} />
                     </div>
                     <div>
                         <label>Email:</label>
-                        <input value={editEmail} onChange={e => setEditEmail(e.target.value)} />
+                        <input value={email} onChange={e => setEmail(e.target.value)} />
                     </div>
                     <div>
                         <label>Photo:</label>
                         <input type="file" accept="image/*" onChange={handlePhotoChange} />
                         {editPhoto && <img src={editPhoto} alt="Preview" style={{ width: 80, borderRadius: "50%" }} />}
                     </div>
-                    <div>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={editIsPublic}
-                                onChange={e => setEditIsPublic(e.target.checked)}
-                                style={{ marginRight: "8px" }}
-                            />
-                            Make my profile public (others can see your profile box and progress bars)
-                        </label>
+                    <div style={{ flex: 1 }} />
+
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+                        <button onClick={() => handleSave()}>Save</button>
+                        <button onClick={handleCancel}>Cancel</button>
                     </div>
-                    <button onClick={handleSave}>Save</button>
-                    <button onClick={handleCancel}>Cancel</button>
                 </div>
             )}
             <div style={{ marginTop: "20px" }}>
                 <strong>Profile is currently: </strong>
                 {isPublic ? "Public" : "Private"}
             </div>
+            {errorMsg && (
+                <div style={{ color: "red", marginTop: "10px" }}>{errorMsg}</div>
+            )}
         </div>
     );
 };
