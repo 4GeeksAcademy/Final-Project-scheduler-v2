@@ -29,7 +29,6 @@ export const CreateEvent = () => {
 
     function changeEventData(e) {
         setEventData((oldEventData) => {
-            console.log("event target id: ", e.target.id)
             return {
                 ...oldEventData,
                 [e.target.id]: e.target.value,
