@@ -36,7 +36,19 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
 
+# class EventType(db.Model):
+#     __tablename__ = "event_types"
+#     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+#     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)  
+#     color: Mapped[str] = mapped_column(String(50), nullable=True)  
 
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "name": self.name,
+#             "color": self.color
+#         }
+    
 class Events(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(unique=False, nullable=False)
@@ -52,7 +64,10 @@ class Events(db.Model):
         back_populates="hosting_events_list")
     repeat: Mapped[dict] = mapped_column(JSON, nullable=True)
     description: Mapped[str] = mapped_column(unique=False, nullable=True)
+    color: Mapped[str] = mapped_column(unique=False, nullable=True)
     timer: Mapped[dict] = mapped_column(JSON, nullable=True)
+    # event_type_id: Mapped[int] = mapped_column(ForeignKey("event_types.id"))
+    # event_type: Mapped["EventType"] = relationship() 
 
     def serialize_attendees(self):
         return {
@@ -70,6 +85,7 @@ class Events(db.Model):
             "host_id": self.host_id,
             "repeat": self.repeat,
             "description": self.description,
+            "color": self.color,
             "timer": self.timer
         }
 

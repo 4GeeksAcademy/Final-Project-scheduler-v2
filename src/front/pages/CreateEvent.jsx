@@ -20,7 +20,7 @@ export const CreateEvent = () => {
         "visibility": "Private",
         "repeat": {}, //maybe have this look like an object? thinking it'll look like 
         "description": "",
-        "timer": { hours: 0, minutes: 0, seconds: 0 }
+        "timer": { "hours": 0, "minutes": 0, "seconds": 0 }
     }); // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
 
     useEffect(() => {
