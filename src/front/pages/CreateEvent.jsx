@@ -9,7 +9,7 @@ export const CreateEvent = () => {
     const [repeatType, setRepeatType] = useState("Daily");
     const [eventVisibility, setEventVisibility] = useState(false);
     const [timerUsed, setTimerUsed] = useState(false);
-    const [timer, setTimer] = useState({ hours: 0, minutes: 0, seconds: 0 });
+    const [timer, setTimer] = useState({ "hours": 0, "minutes": 0, "seconds": 0 });
     const [eventWeekdays, setEventWeekdays] = useState({});
     const [eventData, setEventData] = useState({
         "date": "",
@@ -20,7 +20,7 @@ export const CreateEvent = () => {
         "visibility": "Private",
         "repeat": {}, //maybe have this look like an object? thinking it'll look like 
         "description": "",
-        "timer": { hours: 0, minutes: 0, seconds: 0 }
+        "timer": { "hours": 0, "minutes": 0, "seconds": 0 }
     }); // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
 
     useEffect(() => {
@@ -63,21 +63,14 @@ export const CreateEvent = () => {
         } else if (eventData.time === null) {
             alert("Please enter a start time for the event.")
         } else {
-            if (repeatType == "Daily") {
-                setEventData((oldEventData) => { return { ...oldEventData, "repeat": eventWeekdays } })
-            } else {
-                setEventData((oldEventData) => { return { ...oldEventData, "repeat": null } })
+            const sentData = {
+                ...eventData,
+                "repeat": repeatType === "Daily" ? eventWeekdays : null,
+                "visibility": eventVisibility,
+                "timer": timerUsed ? timer : { "hours": 0, "minutes": 0, "seconds": 0 }
+
             }
-            //line about setting the visibility value in eventData to the eventVisibility State
-            //line about setting the timer value in eventData to the timer State
-            setEventData((oldEventData) => {
-                return {
-                    ...oldEventData,
-                    "visibility": eventVisibility,
-                    "timer": timer
-                }
-            });
-            console.log("eventData: ", eventData)
+            console.log("sentData: ", sentData)
 
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_URL}api/create/event`, {
@@ -86,7 +79,7 @@ export const CreateEvent = () => {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + token
                 },
-                body: JSON.stringify(eventData)
+                body: JSON.stringify(sentData)
             });
             const eventObj = await response.json();
             let user_id = eventObj["createdEvent"]["host_id"]
