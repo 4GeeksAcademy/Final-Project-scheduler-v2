@@ -18,6 +18,8 @@ export default function EventDetails() {
     description: "",
     timer: ""
   });
+  const [seconds, setSeconds] = useState(0);
+
   const { eventId } = useParams();
   async function fetchevent() {
     const response = await fetch(`${API_URL}api/events/${eventId}`)
@@ -29,6 +31,9 @@ export default function EventDetails() {
     fetchevent()
   }, []);
 
+  useEffect(() => {
+    setSeconds(event.timer.hours * 3600 + event.timer.minutes * 60 + event.timer.seconds)
+  }, [event]);
   // MAKE SURE TO ADD COLOR TO THE BOOK- HALEY 
 
 
@@ -53,7 +58,7 @@ export default function EventDetails() {
           <p>🌍 <strong>Visibility:</strong> {event.visibility}</p>
           <p>🔁 <strong>Repeat:</strong> {event.repeat == {} ? (<span></span>) : "yes"}</p>
 
-          <div> 
+          <div>
             🧑‍🤝‍🧑 <strong>Attendees:</strong>
             <ul className="list-disc list-inside ml-5 text-gray-700">
               {event.attendees.map((person, i) => (
@@ -68,7 +73,7 @@ export default function EventDetails() {
           </div>
 
           <div>
-            ⏳ <strong>Timer:</strong> <Timer initialTime={event.timer.hours*360+event.timer.minutes*60+event.timer.seconds} />
+            ⏳ <strong>Timer:</strong> <Timer key={seconds} initialTime={seconds} />
           </div>
         </div>
       </div>
