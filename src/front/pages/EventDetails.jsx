@@ -38,7 +38,7 @@ export default function EventDetails() {
       {/* Event Card */}
       <div
         className="w-full max-w-lg p-6 rounded-lg shadow-md border"
-        style={{ backgroundColor: "red" }}
+        style={{ backgroundColor: event.color }}
       >
         {/* Title + Host */}
         <h1 className="text-2xl font-bold mb-1">{event.name}</h1>
@@ -68,8 +68,7 @@ export default function EventDetails() {
           </div>
 
           <div>
-            ⏳ <strong>Timer:</strong> <Timer initialTime={1800} />
-            {/* need to fix timer */}
+            ⏳ <strong>Timer:</strong> <Timer initialTime={event.timer.hours*360+event.timer.minutes*60+event.timer.seconds} />
           </div>
         </div>
       </div>

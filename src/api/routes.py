@@ -62,6 +62,7 @@ def post_event_create_route():
         host=user,
         repeat=request_body["repeat"],
         description=request_body["description"],
+        color= "white",
         timer=request_body["timer"]
     )
     db.session.add(new_event)
@@ -374,6 +375,7 @@ def delete_goal(goal_id):
 @api.route("/events/<int:eventId>", methods=["GET"])
 def eventdetails (eventId):
     events = Events.query.filter(Events.id == eventId).first()
+    print(events.serialize())
     part_one= events.serialize()
     part_two= events.serialize_attendees()
     combined= part_one | part_two
@@ -401,15 +403,13 @@ def userattendingevents (userId):
         returned_events.append(combined)
     return jsonify({"returned_event": returned_events}), 200
 
-# @api.route("/eventtype/<string:type_name>/color", methods=["PUT"])
-# def update_event_type_color(type_name):
-#     event_type = EventType.query.filter_by(name=type_name).first()
-#     if not event_type:
-#         return jsonify({"error": "Event type not found"}), 404
+@api.route("/eventtype/color", methods=["PUT"])
+def update_event_type_color():
+    request_body = request.json
+    currenteventId= request_body["eventId"]
+    event = Events.query.get(currenteventId)
+    event.color= request_body["color"]
+    db.session.commit()
 
-#     data = request.get_json()
-#     event_type.color = data.get("color")
-#     db.session.commit()
-
-#     return jsonify({"name": event_type.name, "color": event_type.color}), 200
+    return jsonify({"event": event.serialize()}), 200
 
