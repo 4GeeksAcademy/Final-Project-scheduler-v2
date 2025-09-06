@@ -29,6 +29,7 @@ export const CreateEvent = () => {
 
     function changeEventData(e) {
         setEventData((oldEventData) => {
+            console.log("event target id: ", e.target.id)
             return {
                 ...oldEventData,
                 [e.target.id]: e.target.value,
@@ -98,10 +99,10 @@ export const CreateEvent = () => {
 
 
     return (
-        <div className="container-fluid bg-success my-5">
+        <div className="container-fluid bg-success mt-5">
             <div className="container">
                 <div className="row d-flex justify-content-center">
-                    <div className="col-4">
+                    <div className="mt-5 col-4">
                         <h1 className="text-light">Create Event:</h1>
                         <div className="mb-3">
                             <label className="form-label text-light">Event Name:</label>
@@ -134,7 +135,7 @@ export const CreateEvent = () => {
                                 (repeatType == "Date Specific") ?
                                     (<div className="mb-3">
                                         <label className="form-label text-light">Date:</label>
-                                        <input type="date" className="form-control" name="date" value={eventData.date} onChange={changeEventData} />
+                                        <input type="date" className="form-control" id="date" value={eventData.date} onChange={changeEventData} />
                                     </div>) :
                                     (repeatType == "Daily") ?
                                         (<div className="mb-3">
