@@ -14,13 +14,12 @@ export default function Timer({ initialTime }) {
             });
         }, 1000);
 
-
         return () => clearInterval(interval);
     }, []);
-    
-    const minutes = Math.floor(timeLeft / 60);
+    const hours = Math.floor(timeLeft/ 3600);
+    const minutes = Math.floor(timeLeft / 60)%60;
     const seconds = timeLeft % 60;
-    const formattedTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    const formattedTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     
     return <span>{formattedTime}</span>;
 }
