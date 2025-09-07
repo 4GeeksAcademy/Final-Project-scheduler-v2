@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
 
-// trim trailing slash
 const API_URL = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
 const getCurrentWeek = (weekOffset = 0) => {
@@ -23,7 +22,7 @@ const ProfilePage = () => {
 
     // empty by default so nothing flashes
     const [name, setName] = useState("");
-    const [number, setNumber] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [profilePhoto, setProfilePhoto] = useState(defaultProfilePhoto);
 
@@ -32,6 +31,8 @@ const ProfilePage = () => {
     const [error, setError] = useState(null);
     const [weekOffset, setWeekOffset] = useState(0); // 0 = current week
     const [year, setYear] = useState(new Date().getFullYear());
+
+    const [goals, setGoals] = useState([]);
 
     const week = getCurrentWeek(weekOffset);
 
@@ -64,7 +65,7 @@ const ProfilePage = () => {
     }, [year]);
 
     useEffect(() => {
-        if (!userId) return; // Don't fetch if no userId in URL
+        if (!userId) return;
         const fetchUser = async () => {
             try {
                 const token = localStorage.getItem("token");
@@ -73,16 +74,33 @@ const ProfilePage = () => {
                 });
                 if (!res.ok) throw new Error("Failed to fetch user");
                 const data = await res.json();
-                setName(`${data.first_name} ${data.last_name}`);
+                console.log("Fetched user data:", data);
+                setName(data.first_name);
+                setLastName(data.last_name);
                 setEmail(data.email);
-                // if you later return these, they'll fill in automatically
-                // if (data.phone) setNumber(data.phone);
-                // if (data.profile_photo_url) setProfilePhoto(data.profile_photo_url);
             } catch (err) {
                 console.error(err);
             }
         };
         fetchUser();
+    }, [userId]);
+
+    useEffect(() => {
+        if (!userId) return;
+        const fetchGoals = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${API_URL}/api/goals?user_id=${userId}`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+                if (!res.ok) throw new Error("Failed to fetch goals");
+                const data = await res.json();
+                setGoals(data.goals || []);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchGoals();
     }, [userId]);
 
     const holidaysByDate = {};
@@ -121,7 +139,7 @@ const ProfilePage = () => {
                 >
                     {/* Heading above photo */}
                     <h1 style={{ marginBottom: "24px" }}>
-                        {name ? `${name}'s Page` : ""}
+                        {name ? `${name} ${lastName}'s Page` : ""}
                     </h1>
 
                     {/* Circular photo placeholder - larger size? */}
@@ -154,7 +172,6 @@ const ProfilePage = () => {
 
                     {/* Profile info section */}
                     <div>
-                        <p>Number: {number}</p>
                         <p>Email: {email}</p>
                     </div>
                 </div>
@@ -172,74 +189,35 @@ const ProfilePage = () => {
                     }}
                 >
                     <h2>Progress</h2>
-                    {/* Progress Bar 1 */}
-                    <div style={{ marginBottom: "16px" }}>
-                        <span>Read 6 books</span>
-                        <div style={{
-                            background: "#eee",
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            height: "20px",
-                            marginTop: "4px"
-                        }}>
-                            <div style={{
-                                width: "70%",
-                                background: "#4caf50",
-                                height: "100%"
-                            }} />
-                        </div>
-                    </div>
-                    {/* Progress Bar 2 */}
-                    <div style={{ marginBottom: "16px" }}>
-                        <span>Go for 2 walks</span>
-                        <div style={{
-                            background: "#eee",
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            height: "20px",
-                            marginTop: "4px"
-                        }}>
-                            <div style={{
-                                width: "40%",
-                                background: "#2196f3",
-                                height: "100%"
-                            }} />
-                        </div>
-                    </div>
-                    {/* Progress Bar 3 */}
-                    <div style={{ marginBottom: "16px" }}>
-                        <span>Take my dog to the park 7 times</span>
-                        <div style={{
-                            background: "#eee",
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            height: "20px",
-                            marginTop: "4px"
-                        }}>
-                            <div style={{
-                                width: "55%",
-                                background: "#ff9800",
-                                height: "100%"
-                            }} />
-                        </div>
-                    </div>
-                    {/* Progress Bar 4 */}
-                    <div>
-                        <span>Complete daily journal 7 times</span>
-                        <div style={{
-                            background: "#eee",
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            height: "20px",
-                            marginTop: "4px"
-                        }}>
-                            <div style={{
-                                width: "25%",
-                                background: "#9c27b0",
-                                height: "100%"
-                            }} />
-                        </div>
-                    </div>
+                    {goals.length === 0 ? (
+                        <div style={{ color: "#888", margin: "16px 0" }}>No goals yet.</div>
+                    ) : (
+                        goals.map(goal => {
+                            const percent = Math.min(100, (goal.completions / goal.target) * 100);
+                            return (
+                                <div key={goal.id} style={{ marginBottom: "16px" }}>
+                                    <span>{goal.text}</span>
+                                    <div style={{
+                                        background: "#eee",
+                                        borderRadius: "8px",
+                                        overflow: "hidden",
+                                        height: "20px",
+                                        marginTop: "4px"
+                                    }}>
+                                        <div style={{
+                                            width: `${percent}%`,
+                                            background: percent === 100 ? "#4caf50" : "#2196f3",
+                                            height: "100%",
+                                            transition: "width 0.3s"
+                                        }} />
+                                    </div>
+                                    <span style={{ fontSize: "0.9em", color: "#555" }}>
+                                        {goal.completions} / {goal.target}
+                                    </span>
+                                </div>
+                            );
+                        })
+                    )}
                 </div>
                 {/* progress box */}
             </div>
