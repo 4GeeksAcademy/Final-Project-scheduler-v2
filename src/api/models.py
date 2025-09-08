@@ -39,8 +39,8 @@ class User(db.Model):
 # class EventType(db.Model):
 #     __tablename__ = "event_types"
 #     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-#     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)  
-#     color: Mapped[str] = mapped_column(String(50), nullable=True)  
+#     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+#     color: Mapped[str] = mapped_column(String(50), nullable=True)
 
 #     def serialize(self):
 #         return {
@@ -48,7 +48,8 @@ class User(db.Model):
 #             "name": self.name,
 #             "color": self.color
 #         }
-    
+
+
 class Events(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(unique=False, nullable=False)
@@ -67,7 +68,7 @@ class Events(db.Model):
     color: Mapped[str] = mapped_column(unique=False, nullable=True)
     timer: Mapped[dict] = mapped_column(JSON, nullable=True)
     # event_type_id: Mapped[int] = mapped_column(ForeignKey("event_types.id"))
-    # event_type: Mapped["EventType"] = relationship() 
+    # event_type: Mapped["EventType"] = relationship()
 
     def serialize_attendees(self):
         return {
@@ -83,6 +84,7 @@ class Events(db.Model):
             "timezone": self.timezone,
             "visibility": self.visibility,
             "host_id": self.host_id,
+            "host": self.host.serialize(),
             "repeat": self.repeat,
             "description": self.description,
             "color": self.color,

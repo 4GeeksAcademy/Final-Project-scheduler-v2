@@ -174,6 +174,7 @@ const ProfilePage = () => {
                     <div>
                         <p>Email: {email}</p>
                     </div>
+
                 </div>
                 {/* profile box */}
 
@@ -249,15 +250,10 @@ const ProfilePage = () => {
                                     display: "flex",
                                     flexDirection: "column",
                                     alignItems: "center",
-                                    justifyContent: "center"
+                                    justifyContent: "start"
                                 }}
                             >
-                                <div className="row">
-                                    <div className="col" style={{ fontSize: "1.2rem", fontWeight: "500" }}>{day.getDate()}</div>
-                                </div>
-                                <div className="row">
-
-                                </div>
+                                <div style={{ fontSize: "1.2rem", fontWeight: "500" }}>{day.getDate()}</div>
                                 <div style={{ fontSize: "0.9rem", color: "#666" }}>{day.toLocaleString("default", { weekday: "short" })}</div>
                                 {holidaysByDate[iso] && (
                                     <div style={{ marginTop: "4px", fontSize: "0.8rem", color: "#2e7d32" }}>
