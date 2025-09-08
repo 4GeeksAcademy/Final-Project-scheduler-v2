@@ -120,9 +120,9 @@ const SettingsPage = () => {
     };
 
     return (
-        <div style={{ padding: "40px" }}>
+        <div className="mt-3" style={{ padding: "40px" }}>
             <h1>Settings</h1>
-            <button onClick={() => navigate(`/profile/${userId}`)} style={{ marginBottom: "20px" }}>
+            <button className="btn btn-dark rounded-pill" onClick={() => navigate(`/profile/${userId}`)} style={{ marginBottom: "20px" }}>
                 Back to Profile
             </button>
 
@@ -156,7 +156,7 @@ const SettingsPage = () => {
             </div>
 
             {!isEditing ? (
-                <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+                <button className="btn btn-dark rounded-pill" onClick={() => setIsEditing(true)}>Edit Profile</button>
             ) : (
                 <div
                     style={{
@@ -171,26 +171,26 @@ const SettingsPage = () => {
                     {/* ...edit boxes... */}
                     <div>
                         <label>Name:</label>
-                        <input value={name} onChange={e => setName(e.target.value)} />
+                        <input className="input-group-text" value={name} onChange={e => setName(e.target.value)} />
                     </div>
                     <div>
                         <label>Last Name:</label>
-                        <input value={lastName} onChange={e => setLastName(e.target.value)} />
+                        <input className="input-group-text" value={lastName} onChange={e => setLastName(e.target.value)} />
                     </div>
                     <div>
                         <label>Email:</label>
-                        <input value={email} onChange={e => setEmail(e.target.value)} />
+                        <input className="input-group-text" value={email} onChange={e => setEmail(e.target.value)} />
                     </div>
-                    <div>
-                        <label>Photo:</label>
+                    <div className="mt-3">
+                        <label className="me-3">Photo:</label>
                         <input type="file" accept="image/*" onChange={handlePhotoChange} />
                         {editPhoto && <img src={editPhoto} alt="Preview" style={{ width: 80, borderRadius: "50%" }} />}
                     </div>
                     <div style={{ flex: 1 }} />
 
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
-                        <button onClick={() => handleSave()}>Save</button>
-                        <button onClick={handleCancel}>Cancel</button>
+                        <button className="btn btn-dark rounded-pill" onClick={() => handleSave()}>Save</button>
+                        <button className="btn btn-dark rounded-pill" onClick={handleCancel}>Cancel</button>
                     </div>
                 </div>
             )}

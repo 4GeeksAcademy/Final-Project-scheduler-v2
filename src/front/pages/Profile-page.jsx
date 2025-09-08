@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
 
 const API_URL = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
@@ -138,7 +138,7 @@ const ProfilePage = () => {
                     }}
                 >
                     {/* Heading above photo */}
-                    <h1 style={{ marginBottom: "24px" }}>
+                    <h1 className="fs-2" style={{ marginBottom: "24px" }}>
                         {name ? `${name} ${lastName}'s Page` : ""}
                     </h1>
 
@@ -188,14 +188,14 @@ const ProfilePage = () => {
                         marginBottom: "32px"
                     }}
                 >
-                    <h2>Progress</h2>
+                    <h2 className="fs-3">Goal Progress</h2>
                     {goals.length === 0 ? (
                         <div style={{ color: "#888", margin: "16px 0" }}>No goals yet.</div>
                     ) : (
                         goals.map(goal => {
                             const percent = Math.min(100, (goal.completions / goal.target) * 100);
                             return (
-                                <div key={goal.id} style={{ marginBottom: "16px" }}>
+                                <div className="mt-2" key={goal.id} style={{ marginBottom: "16px" }}>
                                     <span>{goal.text}</span>
                                     <div style={{
                                         background: "#eee",
@@ -218,17 +218,18 @@ const ProfilePage = () => {
                             );
                         })
                     )}
+                    <Link to={"/goals"}><button className="bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">more</button></Link>
                 </div>
                 {/* progress box */}
             </div>
 
             {/* Week at a Glance */}
             <div style={{ width: "80vw", maxWidth: "900px", marginTop: "32px" }}>
-                <h2>Week at a Glance</h2>
+                <h2 className="mb-3 fs-3">Week at a Glance</h2>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px", alignItems: "center" }}>
-                    <button onClick={() => setWeekOffset(weekOffset - 1)}>Previous</button>
-                    <button onClick={() => setWeekOffset(0)} style={{ margin: "0 12px" }}>Current Week</button>
-                    <button onClick={() => setWeekOffset(weekOffset + 1)}>Next</button>
+                    <button className="btn btn-dark rounded-pill" onClick={() => setWeekOffset(weekOffset - 1)}>Previous</button>
+                    <button className="btn btn-dark rounded-pill" onClick={() => setWeekOffset(0)} style={{ margin: "0 12px" }}>Current Week</button>
+                    <button className="btn btn-dark rounded-pill" onClick={() => setWeekOffset(weekOffset + 1)}>Next</button>
                     <span style={{ alignSelf: "center", marginLeft: "16px" }}>
                         {week[0].toLocaleDateString()} - {week[6].toLocaleDateString()}
                     </span>
