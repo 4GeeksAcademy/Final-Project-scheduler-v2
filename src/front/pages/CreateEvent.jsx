@@ -7,7 +7,7 @@ export const CreateEvent = () => {
 
     const navigate = useNavigate();
     const [repeatType, setRepeatType] = useState("Daily");
-    const [eventVisibility, setEventVisibility] = useState(false);
+    const [eventVisibility, setEventVisibility] = useState("Private");
     const [timerUsed, setTimerUsed] = useState(false);
     const [timer, setTimer] = useState({ "hours": 0, "minutes": 0, "seconds": 0 });
     const [eventWeekdays, setEventWeekdays] = useState({});
