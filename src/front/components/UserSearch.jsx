@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { NavbarContext } from "../hooks/NavbarContext";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
 export function UserSearch() {
 
+    const { fromNavbar, setFromNavbar, searchbar } = useContext(NavbarContext);
     const [input, setInput] = useState("");
     const [result, setResult] = useState([]);
     const [searched, setSearched] = useState(false);
@@ -14,6 +16,16 @@ export function UserSearch() {
         e.preventDefault();
         setLoading(true)
         const rawResponse = await fetch(`${API_URL}api/search/${input}`);
+        let data = await rawResponse.json();
+        setResult(data["search_results"]);
+        setLoading(false)
+        setSearched(true)
+    }
+
+    async function navbarSearchFunction() {
+        setFromNavbar(false)
+        setLoading(true)
+        const rawResponse = await fetch(`${API_URL}api/search/${searchbar}`);
         let data = await rawResponse.json();
         setResult(data["search_results"]);
         setLoading(false)
@@ -43,9 +55,11 @@ export function UserSearch() {
     }
 
     useEffect(() => {
-        if (input === "") {
-            setSearched(false)
+        console.log("fromNavbar = ", fromNavbar, " && !searched = ", !searched)
+        if (fromNavbar && !searched) {
+            navbarSearchFunction();
         }
+
     }, [result]);
 
     let resultWindow = result.map((user, index) => (

@@ -48,7 +48,7 @@ export const router = createBrowserRouter(
       <Route path="/events/:eventId" element={<EventDetails />} />
       <Route path="/eventlist/:userId" element={<EventList />} />
       <Route path="/favoritesList" element={<FavoritesList />} />
-      <Route path="/searchTest" element={<UserSearch />} />
+      <Route path="/search" element={<UserSearch />} />
     </Route >
 
   )

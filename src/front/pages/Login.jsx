@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { NavbarContext } from '../hooks/NavbarContext.jsx'
+
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const { userID, setUserID } = useContext(NavbarContext);
 
   const navigate = useNavigate();
   const raw = import.meta.env.VITE_BACKEND_URL || "";
@@ -21,7 +24,7 @@ function Login() {
       const res = await fetch(`${backend}/api/token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }), 
+        body: JSON.stringify({ username, password }),
         // ⬆️ backend expects "username" (not "email")
       });
 
@@ -37,6 +40,7 @@ function Login() {
         throw new Error(msg);
       }
 
+      setUserID(data.user_id);
       const token = data.token;
       if (!token) throw new Error("No token returned from server");
 
