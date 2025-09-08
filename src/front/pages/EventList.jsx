@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Timer from "../components/Timer";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { HslColorPicker } from "react-colorful";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
@@ -63,9 +63,10 @@ export default function EventList() {
   return (
     <div>
       <div style={{ marginTop: "80px" }}>
+        <h3 className="fs-3">List of events:</h3>
         {
-          event.map((event, i) => (
-            <div key={i} style={{ backgroundColor: event.color }}>{event.name}</div>
+          (event.length === 0) ? (<div className="mt-2">No events planned. Please add an event.</div>) : event.map((event, i) => (
+            <div className="mt-2" key={i} style={{ backgroundColor: event.color }}>{event.name}</div>
           ))
         }
         {/* THIS IS FOR ATTENDING EVENTS */}
@@ -75,22 +76,25 @@ export default function EventList() {
         ))
       } */}
       </div>
+      <Link to={"/create/event"}><button className="btn btn-dark rounded-pill mt-2">
+        Create a new event
+      </button></Link>
       <div className="mt-4">
-        <p>Select event type:</p>
+        <p>Select an event to highlight:</p>
         <div className="dropdown mb-3">
           <button
-            className="btn btn-light dropdown-toggle"
+            className="btn btn-dark rounded-pill dropdown-toggle"
             type="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            {selectedeventtype.name || "Choose type"}
+            {selectedeventtype.name || "Choose Event"}
           </button>
           <ul className="dropdown-menu">
             <li>
               {event.map((event, i) => (
                 <button
-                key={i}
+                  key={i}
                   className="dropdown-item"
                   onClick={() => setSelectedEventType(event)}
                 >
@@ -105,7 +109,7 @@ export default function EventList() {
         <HslColorPicker color={color} onChange={setColor} />
 
         <p className="mt-4">
-          Selected Color:{" "}
+          Selected Highlight Color:{" "}
           <span
             style={{
               display: "inline-block",
@@ -117,8 +121,8 @@ export default function EventList() {
           />
         </p>
 
-        <button className="btn btn-primary mt-3" onClick={()=>saveEventColor(selectedeventtype.id)}>
-          Save Color for {selectedeventtype.name || "event type"}
+        <button className="btn btn-dark rounded-pill mt-3" onClick={() => saveEventColor(selectedeventtype.id)}>
+          Save Highlight Color for {selectedeventtype.name || "event type"}
         </button>
       </div>
     </div>

@@ -82,10 +82,20 @@ export const CreateEvent = () => {
                 body: JSON.stringify(sentData)
             });
             const eventObj = await response.json();
-            let user_id = eventObj["createdEvent"]["host_id"]
-            console.log(eventObj)
-            navigate(`/profile/${user_id}`);
-            alert("Event Created!");
+            console.log(response)
+            if (response.status === 401) {
+                if (eventObj.msg == "Token has expired") {
+                    alert("Your login session has expired, please log in again.")
+                    navigate("/")
+                } else {
+                    alert("Something went wrong, please redo everything.")
+                }
+            } else {
+                let user_id = eventObj["createdEvent"]["host_id"]
+                navigate(`/eventlist/${user_id}`);
+                alert("Event Created!");
+            }
+
         }
 
     }
