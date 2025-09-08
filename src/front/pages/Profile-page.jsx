@@ -19,7 +19,7 @@ const getCurrentWeek = (weekOffset = 0) => {
 };
 
 const ProfilePage = () => {
-    const { userID, setUserID } = useContext(NavbarContext);
+    const { userID } = useContext(NavbarContext);
     const { userId } = useParams();
     const navigate = useNavigate();
 
@@ -108,8 +108,7 @@ const ProfilePage = () => {
         fetchGoals();
     }, [userId]);
 
-    const handleSignOut = () => {
-        setUserID(-1);
+        const handleSignOut = () => {
         localStorage.removeItem("token")
         localStorage.removeItem("userId")
         localStorage.removeItem("username")
@@ -197,7 +196,7 @@ const ProfilePage = () => {
                     <div>
                         <p>Username: {username}</p>
                     </div>
-                    <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                           <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
                         <Link to={`/listview/${userId}`}>
                             <button className="bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
                                 {`List of events for ${name} ${lastName}`}
