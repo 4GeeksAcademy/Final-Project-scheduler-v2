@@ -18,6 +18,15 @@ export default function EventList() {
     console.log("event: ", data)
     setEvent(data.returned_event)
   }
+  //length
+  async function deleteEvent(event_id) {
+    const response = await fetch(`${API_URL}api/delete/event/${event_id}`, {
+      method: "DELETE"
+    })
+    const data = await response.json();
+    console.log("event: ", data)
+    setEvent(data.remaining_events)
+  }
 
   async function saveEventColor(targetId) {
     if (!selectedeventtype) {
@@ -73,6 +82,9 @@ export default function EventList() {
                   more
                 </button>
               </Link>
+              <button onClick={() => deleteEvent(event.id)} className="ms-3 bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
+                Delete
+              </button>
             </div>
           ))
         }

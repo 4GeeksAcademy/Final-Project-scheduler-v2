@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
+import { NavbarContext } from "../hooks/NavbarContext";
 
 const API_URL = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
@@ -18,6 +19,7 @@ const getCurrentWeek = (weekOffset = 0) => {
 };
 
 const ProfilePage = () => {
+    const { userID } = useContext(NavbarContext);
     const { userId } = useParams();
 
     // empty by default so nothing flashes
@@ -31,6 +33,7 @@ const ProfilePage = () => {
     const [error, setError] = useState(null);
     const [weekOffset, setWeekOffset] = useState(0); // 0 = current week
     const [year, setYear] = useState(new Date().getFullYear());
+    const [username, setUsername] = useState("");
 
     const [goals, setGoals] = useState([]);
 
@@ -78,6 +81,7 @@ const ProfilePage = () => {
                 setName(data.first_name);
                 setLastName(data.last_name);
                 setEmail(data.email);
+                setUsername(data.username);
             } catch (err) {
                 console.error(err);
             }
@@ -90,7 +94,7 @@ const ProfilePage = () => {
         const fetchGoals = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const res = await fetch(`${API_URL}/api/goals?user_id=${userId}`, {
+                const res = await fetch(`${API_URL}/api/profile/goals/${userId}`, {
                     headers: token ? { Authorization: `Bearer ${token}` } : {},
                 });
                 if (!res.ok) throw new Error("Failed to fetch goals");
@@ -109,7 +113,13 @@ const ProfilePage = () => {
         holidaysByDate[holiday.date.iso].push(holiday.name);
     });
 
-    return (
+    return (loading) ? (
+        <div className="text-center my-5">
+            <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    ) : (
         <div
             style={{
                 display: "flex",
@@ -174,7 +184,14 @@ const ProfilePage = () => {
                     <div>
                         <p>Email: {email}</p>
                     </div>
-
+                    <div>
+                        <p>Username: {username}</p>
+                    </div>
+                    <Link to={`/listview/${userId}`}>
+                        <button className="bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
+                            {`List of events for ${name} ${lastName}`}
+                        </button>
+                    </Link>
                 </div>
                 {/* profile box */}
 
@@ -219,7 +236,13 @@ const ProfilePage = () => {
                             );
                         })
                     )}
-                    <Link to={"/goals"}><button className="bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">more</button></Link>
+                    {(userID == userId) ?
+                        (<Link to={"/goals"}>
+                            <button className="bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
+                                more
+                            </button>
+                        </Link>) : (<span></span>)}
+
                 </div>
                 {/* progress box */}
             </div>

@@ -3,7 +3,7 @@ import React, { useContext, createContext, useState } from "react";
 export const NavbarContext = createContext();
 
 export function NavbarProvider({ children }) {
-    const [userID, setUserID] = useState();
+    const [userID, setUserID] = useState(-1);
     const [fromNavbar, setFromNavbar] = useState(false);
     const [searchbar, setSearchbar] = useState("")
 
