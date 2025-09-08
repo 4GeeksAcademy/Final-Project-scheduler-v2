@@ -64,7 +64,7 @@ def post_event_create_route():
         host=user,
         repeat=request_body["repeat"],
         description=request_body["description"],
-        color= "white",
+        color="white",
         timer=request_body["timer"]
     )
     db.session.add(new_event)
@@ -88,6 +88,16 @@ def post_event_route():
     return jsonify("ok"), 200
 
 # --- List all users (consider adding pagination later) ---
+
+
+@api.route('/delete/event/<int:event_id>', methods=['DELETE'])
+def delete_event_create_route(event_id):
+    event = Events.query.get(event_id)
+
+    db.session.delete(event)
+    db.session.commit()
+    events = Events.query.order_by(Events.id.desc()).all()
+    return jsonify({"remaining_events": [e.serialize() for e in events]}), 200
 
 
 @api.route("/users", methods=["GET"])
@@ -395,14 +405,16 @@ def delete_goal(goal_id):
     db.session.commit()
     return jsonify({"message": "Goal deleted successfully"}), 200
 
+
 @api.route("/events/<int:eventId>", methods=["GET"])
-def eventdetails (eventId):
+def eventdetails(eventId):
     events = Events.query.filter(Events.id == eventId).first()
     print(events.serialize())
-    part_one= events.serialize()
-    part_two= events.serialize_attendees()
-    combined= part_one | part_two
+    part_one = events.serialize()
+    part_two = events.serialize_attendees()
+    combined = part_one | part_two
     return jsonify({"returned_event": combined}), 200
+
 
 @api.route("/eventlist/<int:userId>", methods=["GET"])
 def userevents(userId):
@@ -415,8 +427,9 @@ def userevents(userId):
         returned_events.append(combined)
     return jsonify({"returned_event": returned_events}), 200
 
+
 @api.route("/attendingeventlist/<int:userId>", methods=["GET"])
-def userattendingevents (userId):
+def userattendingevents(userId):
     user = Userdata.query.get(userId)
     returned_events = []
     for event in user.attending_events_list:
@@ -426,13 +439,13 @@ def userattendingevents (userId):
         returned_events.append(combined)
     return jsonify({"returned_event": returned_events}), 200
 
+
 @api.route("/eventtype/color", methods=["PUT"])
 def update_event_type_color():
     request_body = request.json
-    currenteventId= request_body["eventId"]
+    currenteventId = request_body["eventId"]
     event = Events.query.get(currenteventId)
-    event.color= request_body["color"]
+    event.color = request_body["color"]
     db.session.commit()
 
     return jsonify({"event": event.serialize()}), 200
-

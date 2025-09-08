@@ -22,6 +22,7 @@ export default function EventDetails() {
   const [seconds, setSeconds] = useState(0);
 
   const { eventId } = useParams();
+
   async function fetchevent() {
     const response = await fetch(`${API_URL}api/events/${eventId}`)
     const data = await response.json();
@@ -29,6 +30,7 @@ export default function EventDetails() {
     setEvent(data.returned_event)
     setLoaded(true)
   }
+
   useEffect(() => {
     fetchevent()
   }, []);
