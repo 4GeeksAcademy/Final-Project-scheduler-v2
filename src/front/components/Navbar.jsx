@@ -1,10 +1,17 @@
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { NavbarContext } from "../hooks/NavbarContext.jsx";
+import TimeTidyLogoImageUrl from "../assets/img/updatedLogoCropped.png";
+
 
 export const Navbar = () => {
+
+	const { userID, searchbar, setSearchbar, setFromNavbar } = useContext(NavbarContext);
+
 	return (
 		<nav className="navbar bg-body-tertiary fixed-top">
 			<div className="container-fluid">
-				<Link className="navbar-brand" to="/">Time Tidy</Link>
+				<Link className="navbar-brand " to="/"><img src={TimeTidyLogoImageUrl} alt="Time Tidy" style={{ maxWidth: "155px" }} /></Link>
 
 
 				<button
@@ -35,7 +42,7 @@ export const Navbar = () => {
 								<Link className="nav-link active" to="/">Home</Link>
 							</li>
 							<li className="nav-item">
-								<Link className="nav-link" to="/profile">Profile</Link>
+								<Link className="nav-link" to={`/profile/${userID}`}>Profile</Link>
 							</li>
 							<li className="nav-item dropdown">
 								<a
@@ -49,14 +56,12 @@ export const Navbar = () => {
 								</a>
 								<ul className="dropdown-menu">
 									<li><Link className="dropdown-item" to="/goals">Goals</Link></li>
-									<li><Link className="dropdown-item" to="/events">Events</Link></li>
-									<li><Link className="dropdown-item" to="/calendar">Calendar</Link></li>
+									<li><Link className="dropdown-item" to={`/eventlist/${userID}`}>Events</Link></li>
 									<li><Link className="dropdown-item" to="/favoritesList">Friends</Link></li>
 									<li>
 										<hr className="dropdown-divider" />
 									</li>
 									<li><Link className="dropdown-item" to="/settings">Settings</Link></li>
-									<li><Link className="dropdown-item" to="/support">Support</Link></li>
 								</ul>
 							</li>
 						</ul>
@@ -66,8 +71,10 @@ export const Navbar = () => {
 								type="search"
 								placeholder="Search"
 								aria-label="Search"
+								value={searchbar}
+								onChange={(event) => setSearchbar(event.target.value)}
 							/>
-							<button className="btn btn-outline-success" type="submit">Search</button>
+							<Link to={"/search"} onClick={() => setFromNavbar(true)}><button className="btn btn-outline-success">Search</button></Link>
 						</form>
 					</div>
 				</div>

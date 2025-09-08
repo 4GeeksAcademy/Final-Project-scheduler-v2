@@ -5,6 +5,7 @@ import { RouterProvider } from "react-router-dom";  // Import RouterProvider to 
 import { router } from "./routes";  // Import the router configuration
 import { StoreProvider } from './hooks/useGlobalReducer';  // Import the StoreProvider for global state management
 import { BackendURL } from './components/BackendURL';
+import { NavbarProvider } from './hooks/NavbarContext.jsx';
 
 
 const Main = () => {
@@ -17,11 +18,13 @@ const Main = () => {
     return (
         <React.StrictMode>
             {/* Provide global state to all components */}
-            <StoreProvider>
-                {/* Set up routing for the application */}
-                <RouterProvider router={router}>
-                </RouterProvider>
-            </StoreProvider>
+            <NavbarProvider>
+                <StoreProvider>
+                    {/* Set up routing for the application */}
+                    <RouterProvider router={router}>
+                    </RouterProvider>
+                </StoreProvider>
+            </NavbarProvider>
         </React.StrictMode>
     );
 }
