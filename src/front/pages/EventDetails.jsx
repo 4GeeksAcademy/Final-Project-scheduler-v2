@@ -56,7 +56,8 @@ export default function EventDetails() {
 
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 pt-16">
+    <div className="d-flex flex-column items-center justify-center min-h-screen bg-gray-100 pt-16">
+      <h1 className="fs-1 mb-3">Event Details:</h1>
       {/* Event Card */}
       {
         (!loaded) ? (
