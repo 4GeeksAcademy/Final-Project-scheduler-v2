@@ -56,7 +56,12 @@ function Login() {
       if (!me?.id) throw new Error("No user id returned from /api/me");
 
       // 3) Redirect to profile page
-      navigate(`/profile/${me.id}`);
+
+      // Note from Connor: 
+      // on second thought, dont redirect to profile page, it uses up a fetch response from the 3rd party API
+      // so it ends up eating into the 500 requests per month per key, even though the keys are free to get as long as you make a free account
+      //navigate(`/profile/${me.id}`);
+      navigate('/search');
     } catch (e) {
       setErr(e.message || "Login failed");
     } finally {

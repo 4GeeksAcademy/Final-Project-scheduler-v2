@@ -42,7 +42,7 @@ export const Navbar = () => {
 								<Link className="nav-link active" to="/">Home</Link>
 							</li>
 							<li className="nav-item">
-								<Link className="nav-link" to={`/profile/${userID}`}>Profile</Link>
+								<Link className="nav-link" to={`/profile/${userID}`}>My Profile</Link>
 							</li>
 							<li className="nav-item dropdown">
 								<a
@@ -55,9 +55,9 @@ export const Navbar = () => {
 									Navigate
 								</a>
 								<ul className="dropdown-menu">
-									<li><Link className="dropdown-item" to="/goals">Goals</Link></li>
-									<li><Link className="dropdown-item" to={`/eventlist/${userID}`}>Events</Link></li>
-									<li><Link className="dropdown-item" to="/favoritesList">Friends</Link></li>
+									<li><Link className="dropdown-item" to="/goals">My Goals</Link></li>
+									<li><Link className="dropdown-item" to={`/eventlist/${userID}`}>My Events</Link></li>
+									<li><Link className="dropdown-item" to="/favoritesList">My Friends</Link></li>
 									<li>
 										<hr className="dropdown-divider" />
 									</li>
