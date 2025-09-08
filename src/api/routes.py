@@ -449,3 +449,12 @@ def update_event_type_color():
     db.session.commit()
 
     return jsonify({"event": event.serialize()}), 200
+
+
+@api.route("/profile/goals/<int:user_id>", methods=["GET"])
+def get_profile_goals_route(user_id):
+    # Query the database for all goals belonging to this user
+    user_goals = Goal.query.filter_by(user_id=user_id).all()
+
+    # Serialize the goals to a list of dictionaries and return them
+    return jsonify({"goals": [goal.serialize() for goal in user_goals]}), 200
