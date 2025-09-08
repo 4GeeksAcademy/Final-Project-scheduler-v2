@@ -73,19 +73,23 @@ def post_event_create_route():
     return jsonify({"createdEvent": new_event.serialize()}), 200
 
 
-@api.route('/editEvent', methods=['PUT'])
-def post_event_route():
+@api.route('/editEvent/<int:event_id>', methods=['PUT'])
+def post_event_route(event_id):
 
     # do updating in the database
     request_data = request.json
     event_id = request_data["id"]
     event = Events.query.get(event_id)
+    event.name = request_data["name"]
     event.date = request_data["date"]
-    # do all the other event fields
-
+    event.time = request_data["time"]
+    event.visibility = request_data["visibility"]
+    event.repeat = request_data["repeat"]
+    event.description = request_data["description"]
+    event.timer = request_data["timer"]
     db.session.commit()  # <-- ensure changes persist
 
-    return jsonify("ok"), 200
+    return jsonify({"editedEvent": event.serialize()}), 200
 
 # --- List all users (consider adding pagination later) ---
 

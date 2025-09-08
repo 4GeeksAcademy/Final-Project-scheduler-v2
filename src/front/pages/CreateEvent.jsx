@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
-export const CreateEvent = () => {
+export const CreateEvent = (props) => {
 
     const navigate = useNavigate();
     const [repeatType, setRepeatType] = useState("Daily");
@@ -58,9 +58,9 @@ export const CreateEvent = () => {
 
     async function sendEventData() {
         //the following 4 lines needs a bit more details on how the data is gonna be stored
-        if (eventData.name === null) {
+        if (eventData.name === "") {
             alert("Please enter a name for the event.");
-        } else if (eventData.time === null) {
+        } else if (eventData.time === "") {
             alert("Please enter a start time for the event.")
         } else {
             const sentData = {
@@ -108,11 +108,12 @@ export const CreateEvent = () => {
 
 
     return (
-        <div className="container-fluid bg-success mt-5">
-            <div className="container">
-                <div className="row d-flex justify-content-center">
+        <div className="container-fluid mt-5">
+            <div className="py-3"><span></span></div>
+            <div className="card container">
+                <div className="row d-flex justify-content-center p-5">
                     <div className="mt-5 col-4">
-                        <h1 className="text-light">Create Event:</h1>
+                        <h1 className="fs-1">Create Event:</h1>
                         <div className="mb-3">
                             <label className="form-label text-light">Event Name:</label>
                             <input type="text" className="form-control w-50" id="name" value={eventData.name} onChange={changeEventData} />
