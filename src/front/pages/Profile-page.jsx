@@ -174,6 +174,7 @@ const ProfilePage = () => {
                     <div>
                         <p>Email: {email}</p>
                     </div>
+
                 </div>
                 {/* profile box */}
 
@@ -249,7 +250,7 @@ const ProfilePage = () => {
                                     display: "flex",
                                     flexDirection: "column",
                                     alignItems: "center",
-                                    justifyContent: "center"
+                                    justifyContent: "start"
                                 }}
                             >
                                 <div style={{ fontSize: "1.2rem", fontWeight: "500" }}>{day.getDate()}</div>

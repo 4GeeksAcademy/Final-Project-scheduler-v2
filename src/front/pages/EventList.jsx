@@ -66,7 +66,14 @@ export default function EventList() {
         <h3 className="fs-3">List of events:</h3>
         {
           (event.length === 0) ? (<div className="mt-2">No events planned. Please add an event.</div>) : event.map((event, i) => (
-            <div className="mt-2" key={i} style={{ backgroundColor: event.color }}>{event.name}</div>
+            <div className="mt-2 p-3 card d-flex flex-row" key={i} style={{ backgroundColor: event.color }}>
+              <div className="card container fs-4 m-0" style={{ maxWidth: "400px" }}>{event.name} </div>
+              <Link to={`/events/${event.id}`}>
+                <button className="ms-3 bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
+                  more
+                </button>
+              </Link>
+            </div>
           ))
         }
         {/* THIS IS FOR ATTENDING EVENTS */}
