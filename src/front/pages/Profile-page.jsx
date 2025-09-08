@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
 import { NavbarContext } from "../hooks/NavbarContext";
 
@@ -21,6 +21,7 @@ const getCurrentWeek = (weekOffset = 0) => {
 const ProfilePage = () => {
     const { userID } = useContext(NavbarContext);
     const { userId } = useParams();
+    const navigate = useNavigate();
 
     // empty by default so nothing flashes
     const [name, setName] = useState("");
@@ -107,6 +108,14 @@ const ProfilePage = () => {
         fetchGoals();
     }, [userId]);
 
+      const handleSignOut = () => {
+  localStorage.removeItem("token")
+  localStorage.removeItem("userId")
+  localStorage.removeItem("username")
+  navigate("/")
+}
+
+
     const holidaysByDate = {};
     holidays.forEach(holiday => {
         holidaysByDate[holiday.date.iso] = holidaysByDate[holiday.date.iso] || [];
@@ -187,11 +196,25 @@ const ProfilePage = () => {
                     <div>
                         <p>Username: {username}</p>
                     </div>
-                    <Link to={`/listview/${userId}`}>
-                        <button className="bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
-                            {`List of events for ${name} ${lastName}`}
-                        </button>
-                    </Link>
+                           <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                        <Link to={`/listview/${userId}`}>
+                            <button className="bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
+                                {`List of events for ${name} ${lastName}`}
+                            </button>
+                        </Link>
+
+                        {/* --- ADDED: SIGN OUT BUTTON (only for own profile) --- */}
+                        {String(userID) === String(userId) && (
+                            <button
+                                onClick={handleSignOut}
+                                className="btn btn-outline-danger rounded-pill"
+                                title="Sign out"
+                            >
+                                Sign Out
+                            </button>
+                        )}
+                        {/* ---------------------------------------------------- */}
+                    </div>
                 </div>
                 {/* profile box */}
 
