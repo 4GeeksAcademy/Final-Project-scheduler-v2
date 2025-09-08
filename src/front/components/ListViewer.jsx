@@ -11,7 +11,7 @@ export default function ListViewer() {
     const navigate = useNavigate();
 
     async function fetchUserEvents() {
-        const response = await fetch(`${API_URL}api/eventlist/${userId}`)
+        const response = await fetch(`${API_URL}api/listview/${userId}`)
         const data = await response.json();
         console.log("event: ", data)
         setEvent(data.returned_event)
@@ -31,7 +31,7 @@ export default function ListViewer() {
             <div style={{ marginTop: "80px" }}>
                 <h3 className="fs-3">List of events:</h3>
                 {
-                    (event.length === 0) ? (<div className="mt-2">No events planned.</div>) : event.map((event, i) => (
+                    (event.length === 0) ? (<div className="mt-2">No public events planned.</div>) : event.map((event, i) => (
                         <div className="mt-2 p-3 card d-flex flex-row" key={i} style={{ backgroundColor: event.color }}>
                             <div className="card container fs-4 m-0" style={{ maxWidth: "400px" }}>{event.name} </div>
                             <Link to={`/events/${event.id}`}>

@@ -458,3 +458,40 @@ def get_profile_goals_route(user_id):
 
     # Serialize the goals to a list of dictionaries and return them
     return jsonify({"goals": [goal.serialize() for goal in user_goals]}), 200
+
+
+@api.route("/listview/<int:userId>", methods=["GET"])
+def get_public_userevents_route(userId):
+    events = Events.query.filter(
+        Events.host_id == userId, Events.visibility == "Public").all()
+    returned_events = []
+    for event in events:
+        part_one = event.serialize()
+        part_two = event.serialize_attendees()
+        combined = part_one | part_two
+        returned_events.append(combined)
+    return jsonify({"returned_event": returned_events}), 200
+
+
+@api.route('/attendee/<string:action>/<int:user_id>/<int:event_id>', methods=['PUT'])
+def put_user_attendee_route(action: str, user_id: int, event_id: int):
+    event = Events.query.get(event_id)
+    target = Userdata.query.get(user_id)
+    if action == "join":
+        if len(event.serialize_attendees()) == 0:
+            filtered_list = []
+        else:
+            listings = event.serialize_attendees()["attendees"]
+            print(listings)
+            filtered_list = list(
+                filter(lambda user: user["id"] == target.id, event.serialize_attendees()["attendees"]))
+        if len(filtered_list) > 0:
+            return jsonify({"id": event.id, "attendees": event.serialize_attendees(), "status": "dupe"}), 200
+        event.attendees.append(target)
+    elif action == "leave":
+        event.attendees.remove(target)
+    db.session.commit()
+    part_one = event.serialize()
+    part_two = event.serialize_attendees()
+    combined = part_one | part_two
+    return jsonify({"id": event.id, "event": combined, "attendees": event.serialize_attendees(), "status": "good"}), 200
