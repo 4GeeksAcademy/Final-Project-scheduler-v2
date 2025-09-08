@@ -45,7 +45,7 @@ const ProfilePage = () => {
         const fetchHolidays = async () => {
             setLoading(true);
             setError(null);
-            const apiKey = "gAwykI0JDFTe6Iw0HyvdaNmiYooQrPAb";
+            const apiKey = "3CRFaZmG1Jgk2FfIxOQBEfPhznPP7ckL";
             const country = "US";
 
             try {
@@ -252,7 +252,12 @@ const ProfilePage = () => {
                                     justifyContent: "center"
                                 }}
                             >
-                                <div style={{ fontSize: "1.2rem", fontWeight: "500" }}>{day.getDate()}</div>
+                                <div className="row">
+                                    <div className="col" style={{ fontSize: "1.2rem", fontWeight: "500" }}>{day.getDate()}</div>
+                                </div>
+                                <div className="row">
+
+                                </div>
                                 <div style={{ fontSize: "0.9rem", color: "#666" }}>{day.toLocaleString("default", { weekday: "short" })}</div>
                                 {holidaysByDate[iso] && (
                                     <div style={{ marginTop: "4px", fontSize: "0.8rem", color: "#2e7d32" }}>
