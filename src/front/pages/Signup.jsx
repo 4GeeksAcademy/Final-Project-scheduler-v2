@@ -13,8 +13,7 @@ export const Signup = () => {
   const [successMsg, setSuccessMsg] = useState("");
 
   const navigate = useNavigate();
-
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -23,7 +22,6 @@ export const Signup = () => {
       setErrorMsg("Backend URL is missing in your .env file");
       return;
     }
-
     if (gender === "") {
       setErrorMsg("Please select a gender");
       return;
@@ -33,15 +31,15 @@ export const Signup = () => {
     setErrorMsg("");
     setSuccessMsg("");
 
-    const apiUrl = backendUrl + "api/signup";
+    const apiUrl = `${backendUrl.replace(/\/$/, "")}/api/signup`;
 
     const bodyData = {
-      username: username,
+      username,
       first_name: firstName,
       last_name: lastName,
-      email: email,
-      password: password,
-      gender: gender,
+      email,
+      password,
+      gender,
     };
 
     fetch(apiUrl, {
@@ -84,147 +82,172 @@ export const Signup = () => {
         minHeight: "100vh",
       }}
     >
-      <div
-        className="card shadow-lg border-0"
-        style={{
-          borderRadius: "1rem",
-          overflow: "hidden",
-          width: "100%",
-          maxWidth: "500px",
-        }}
-      >
-        <div className="card-header bg-white text-center py-4 border-0">
-          <h1 className="card-title fw-bold text-primary mb-1">Sign Up</h1>
-          <p className="card-text text-muted mb-0">
-            Create your account to get started
-          </p>
-        </div>
+      <div className="w-100" style={{ maxWidth: "500px" }}>
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-6">
+          {/* Header */}
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 tracking-tight mb-2">
+              Sign Up
+            </h1>
+            <p className="text-gray-500 text-lg">
+              Create your account to get started
+            </p>
+          </div>
 
-        <div className="card-body p-4 p-md-5 bg-white">
+          {/* Alerts */}
           {errorMsg !== "" && (
-            <div className="alert alert-danger mb-3">{errorMsg}</div>
+            <div className="bg-red-500 text-white p-4 rounded-xl shadow-md text-center">
+              {errorMsg}
+            </div>
           )}
           {successMsg !== "" && (
-            <div className="alert alert-success mb-3">{successMsg}</div>
+            <div className="bg-green-500 text-white p-4 rounded-xl shadow-md text-center">
+              {successMsg}
+            </div>
           )}
 
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="username" className="form-label fw-semibold">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label
+                htmlFor="username"
+                className="block mb-2 font-semibold text-gray-700"
+              >
                 Username
               </label>
               <input
                 id="username"
                 type="text"
-                className="form-control rounded-pill"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7FC1E0] transition-colors duration-200"
                 placeholder="Enter your username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
                 required
               />
             </div>
 
-            <div className="mb-3">
-              <label htmlFor="firstName" className="form-label fw-semibold">
+            <div>
+              <label
+                htmlFor="firstName"
+                className="block mb-2 font-semibold text-gray-700"
+              >
                 First Name
               </label>
               <input
                 id="firstName"
                 type="text"
-                className="form-control rounded-pill"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7FC1E0] transition-colors duration-200"
                 placeholder="Enter your first name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                autoComplete="given-name"
                 required
               />
             </div>
 
-            <div className="mb-3">
-              <label htmlFor="lastName" className="form-label fw-semibold">
+            <div>
+              <label
+                htmlFor="lastName"
+                className="block mb-2 font-semibold text-gray-700"
+              >
                 Last Name
               </label>
               <input
                 id="lastName"
                 type="text"
-                className="form-control rounded-pill"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7FC1E0] transition-colors duration-200"
                 placeholder="Enter your last name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                autoComplete="family-name"
                 required
               />
             </div>
 
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label fw-semibold">
+            <div>
+              <label
+                htmlFor="email"
+                className="block mb-2 font-semibold text-gray-700"
+              >
                 Email address
               </label>
               <input
                 id="email"
                 type="email"
-                className="form-control rounded-pill"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7FC1E0] transition-colors duration-200"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 required
               />
             </div>
 
-            <div className="mb-4">
-              <label htmlFor="password" className="form-label fw-semibold">
+            <div>
+              <label
+                htmlFor="password"
+                className="block mb-2 font-semibold text-gray-700"
+              >
                 Password
               </label>
               <input
                 id="password"
                 type="password"
-                className="form-control rounded-pill"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7FC1E0] transition-colors duration-200"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
                 required
               />
             </div>
 
-            <div className="mb-4">
-              <label htmlFor="gender" className="form-label fw-semibold">
+            <div>
+              <label
+                htmlFor="gender"
+                className="block mb-2 font-semibold text-gray-700"
+              >
                 Gender
               </label>
               <select
                 id="gender"
-                className="form-select rounded-pill"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7FC1E0] transition-colors duration-200"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
+                required
               >
-                <option value="">Select gender</option>
+                <option value="" disabled>
+                  Select gender
+                </option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
             </div>
 
-            <div className="d-grid">
-              <button
-                type="submit"
-                className="btn btn-primary btn-lg fw-semibold rounded-pill"
-                disabled={loading}
-              >
-                {loading ? "Signing up..." : "Sign Up"}
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full bg-[#7FC1E0] text-white font-semibold py-3 rounded-xl shadow-md hover:bg-[#5fa9cb] transition-colors duration-200 disabled:opacity-50"
+              disabled={loading}
+              aria-busy={loading}
+            >
+              {loading ? "Signing up…" : "Sign Up"}
+            </button>
           </form>
-        </div>
 
-        <div className="card-footer bg-light border-0 text-center py-3">
-          <span className="text-muted">Already have an account?</span>
-          <Link
-            to="/"
-            className="btn btn-outline-primary btn-sm ms-2 rounded-pill"
-          >
-            Sign in
-          </Link>
+          {/* Footer */}
+          <div className="text-center">
+            <span className="text-gray-500">Already have an account?</span>
+            <Link
+              to="/"
+              className="inline-block ml-2 border border-[#7FC1E0] text-[#28779a] font-semibold py-2 px-4 rounded-full hover:bg-[#e9f5fb] transition-colors duration-200"
+            >
+              Sign in
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
-
