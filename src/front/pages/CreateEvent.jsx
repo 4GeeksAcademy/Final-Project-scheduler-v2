@@ -101,8 +101,8 @@ export const CreateEvent = (props) => {
     }
     let weeklyCheckboxes = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday"].map((days, index) => (
         <div className="mb-3 mx-2 form-check" key={index}>
-            <input type="checkbox" className="form-check-input" id={days} onChange={changeWeekdays} />
-            <label className="form-check-label">{days}</label>
+            <input type="checkbox" className="form-check-input border-dark border-opacity-50" id={days} onChange={changeWeekdays} />
+            <label className="form-check-label ">{days}</label>
         </div>));
 
 
@@ -110,29 +110,29 @@ export const CreateEvent = (props) => {
     return (
         <div className="container-fluid mt-5">
             <div className="py-3"><span></span></div>
-            <div className="card container">
+            <div className="container card border-dark border-opacity-50">
                 <div className="row d-flex justify-content-center p-5">
                     <div className="mt-5 col-4">
                         <h1 className="fs-1">Create Event:</h1>
                         <div className="mb-3">
-                            <label className="form-label text-light">Event Name:</label>
-                            <input type="text" className="form-control w-50" id="name" value={eventData.name} onChange={changeEventData} />
+                            <label className="form-label">Event Name:</label>
+                            <input type="text" className="form-control w-50 border-dark border-opacity-50" id="name" value={eventData.name} onChange={changeEventData} />
                         </div>
                         <div className="dropdown">
-                            <button className="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-describedby="publicHelp">
+                            <button className="btn btn-dark rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-describedby="publicHelp">
                                 {(eventVisibility === "Public") ? "Public" : "Private"}
                             </button>
-                            <ul className="dropdown-menu">
+                            <ul className="dropdown-menu border-dark border-opacity-50">
                                 <li><button className="dropdown-item" onClick={() => setEventVisibility("Public")}>Public</button></li>
                                 <li><button className="dropdown-item" onClick={() => setEventVisibility("Private")}>Private</button></li>
                             </ul>
                         </div>
                         <div id="publicHelp" className="form-text mb-3">Switches if this event can be seen by others.</div>
                         <div className="dropdown">
-                            <button className="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-describedby="repeatHelp">
+                            <button className="btn btn-dark rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-describedby="repeatHelp">
                                 {repeatType}
                             </button>
-                            <ul className="dropdown-menu">
+                            <ul className="dropdown-menu border-dark border-opacity-50">
                                 <li><button className="dropdown-item" onClick={() => setRepeatType("Daily")}>Daily</button></li>
                                 <li><button className="dropdown-item" onClick={() => setRepeatType("Date Specific")}>Date Specific</button></li>
                                 <li><button className="dropdown-item" onClick={() => setRepeatType("No Repeat")}>No Repeat</button></li>
@@ -144,43 +144,43 @@ export const CreateEvent = (props) => {
                                 (<span></span>) :
                                 (repeatType == "Date Specific") ?
                                     (<div className="mb-3">
-                                        <label className="form-label text-light">Date:</label>
-                                        <input type="date" className="form-control" id="date" value={eventData.date} onChange={changeEventData} />
+                                        <label className="form-label">Date:</label>
+                                        <input type="date" className="form-control border-dark border-opacity-50" id="date" value={eventData.date} onChange={changeEventData} />
                                     </div>) :
                                     (repeatType == "Daily") ?
                                         (<div className="mb-3">
-                                            <label className="form-label text-light">Days:</label>
+                                            <label className="form-label">Days:</label>
                                             <div className="d-flex flex-row flex-wrap">
                                                 {weeklyCheckboxes}
                                             </div>
                                         </div>) : (<span></span>)}
                             <div className="mb-3">
-                                <label className="form-label text-light">Start Time:</label>
-                                <input type="time" className="form-control w-50" id="time" value={eventData.time} onChange={changeEventData} />
+                                <label className="form-label">Start Time:</label>
+                                <input type="time" className="form-control w-50 border-dark border-opacity-50" id="time" value={eventData.time} onChange={changeEventData} />
                             </div>
                             <div className="mb-3 mt-2 form-check p-0">
-                                <label className="form-label text-light">Description:</label>
-                                <textarea className="form-control" rows="3" id="description" onChange={changeEventData} value={eventData.description}></textarea>
+                                <label className="form-label">Description:</label>
+                                <textarea className="form-control border-dark border-opacity-50" rows="3" id="description" onChange={changeEventData} value={eventData.description}></textarea>
                                 <div className="form-text mb-3">Write details you want to note down about this event here.</div>
                             </div>
                             <div className="mb-3 mt-5 form-check">
-                                <input type="checkbox" className="form-check-input" checked={timerUsed} onChange={() => setTimerUsed(!timerUsed)} />
-                                <label className="form-label text-light">Set event duration Timer:</label>
+                                <input type="checkbox" className="form-check-input border-dark border-opacity-50" checked={timerUsed} onChange={() => setTimerUsed(!timerUsed)} />
+                                <label className="form-label">Set event duration Timer:</label>
                             </div>
 
                             {(timerUsed) ? (<div className="mb-3">
                                 <div className="d-flex flex-row">
                                     <div className="mb-3 mx-2 form-check">
-                                        <input type="number" className="form-control" id="hours" value={timer.hours} onChange={changeTimer} />
-                                        <label className="form-check-label text-light">Hours</label>
+                                        <input type="number" className="form-control border-dark border-opacity-50" id="hours" value={timer.hours} onChange={changeTimer} />
+                                        <label className="form-check-label">Hours</label>
                                     </div>
                                     <div className="mb-3 mx-2 form-check">
-                                        <input type="number" className="form-control" id="minutes" value={timer.minutes} onChange={changeTimer} />
-                                        <label className="form-check-label text-light">Minutes</label>
+                                        <input type="number" className="form-control border-dark border-opacity-50" id="minutes" value={timer.minutes} onChange={changeTimer} />
+                                        <label className="form-check-label">Minutes</label>
                                     </div>
                                     <div className="mb-3 mx-2 form-check">
-                                        <input type="number" className="form-control" id="seconds" value={timer.seconds} onChange={changeTimer} />
-                                        <label className="form-check-label text-light">Seconds</label>
+                                        <input type="number" className="form-control border-dark border-opacity-50" id="seconds" value={timer.seconds} onChange={changeTimer} />
+                                        <label className="form-check-label">Seconds</label>
                                     </div>
                                 </div>
                             </div>) : (<span></span>)}

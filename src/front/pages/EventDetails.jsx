@@ -22,7 +22,7 @@ export default function EventDetails() {
   const [loaded, setLoaded] = useState(false);
   const [seconds, setSeconds] = useState(0);
 
-  const { userID } = useContext(NavbarContext)
+  const { userID, timerStart, setTimerStart } = useContext(NavbarContext)
   const { eventId } = useParams();
 
   async function fetchevent() {
@@ -44,6 +44,7 @@ export default function EventDetails() {
   }
 
   useEffect(() => {
+    setTimerStart(false)
     fetchevent()
   }, []);
 
@@ -107,8 +108,8 @@ export default function EventDetails() {
                 ⏳ <strong>Timer:</strong> <Timer key={seconds} initialTime={seconds} />
               </div>
               <div className="mb-3">
-                <button className="ms-3 bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
-                  Start Timer
+                <button onClick={() => setTimerStart(!timerStart)} className="ms-3 bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
+                  {(!timerStart) ? "Start Timer" : "Pause Timer"}
                 </button>
                 {(!loaded) ? `` :
                   (event.attendees.map((attendee) => attendee.id).find((element) => userID == element) === undefined) ?
