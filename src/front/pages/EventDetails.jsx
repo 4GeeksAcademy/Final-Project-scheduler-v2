@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Timer from "../components/Timer";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { NavbarContext } from "../hooks/NavbarContext";
 
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
@@ -18,22 +19,43 @@ export default function EventDetails() {
     description: "",
     timer: ""
   });
+  const [loaded, setLoaded] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+
+  const { userID } = useContext(NavbarContext)
   const { eventId } = useParams();
+
   async function fetchevent() {
     const response = await fetch(`${API_URL}api/events/${eventId}`)
     const data = await response.json();
     console.log("event: ", data)
     setEvent(data.returned_event)
+    setLoaded(true)
   }
+
+  async function joinLeaveEvent(action) {
+    setLoaded(false)
+    const response = await fetch(`${API_URL}api/attendee/${action}/${userID}/${eventId}`, {
+      method: "PUT"
+    });
+    const data = await response.json();
+    setEvent(data.event)
+    setLoaded(true)
+  }
+
   useEffect(() => {
     fetchevent()
   }, []);
 
+  useEffect(() => {
+    setSeconds(event.timer.hours * 3600 + event.timer.minutes * 60 + event.timer.seconds)
+    console.log("host: ", event.host)
+  }, [event]);
   // MAKE SURE TO ADD COLOR TO THE BOOK- HALEY 
 
 
 
- return (
+  return (
   <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 pt-20 pb-24 px-4">
     <h1 className="text-3xl font-bold mb-6 text-gray-800">Event Details</h1>
 
@@ -79,7 +101,7 @@ export default function EventDetails() {
               <ul className="list-disc list-inside ml-5 mt-1">
                 {event.repeat == {} ? (
                   <li>This event doesn't repeat</li>
-                ) : (event.repeat === null) ? (<li>This event doesn't repeat</li>): (
+                ) : (
                   Object.keys(event.repeat).map((day, index) => (
                     <li key={index}>{day}</li>
                   ))
