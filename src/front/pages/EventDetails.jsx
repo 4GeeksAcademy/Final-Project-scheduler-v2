@@ -79,7 +79,7 @@ export default function EventDetails() {
               <ul className="list-disc list-inside ml-5 mt-1">
                 {event.repeat == {} ? (
                   <li>This event doesn't repeat</li>
-                ) : (
+                ) : (event.repeat === null) ? (<li>This event doesn't repeat</li>): (
                   Object.keys(event.repeat).map((day, index) => (
                     <li key={index}>{day}</li>
                   ))
