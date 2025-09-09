@@ -84,14 +84,14 @@ export function UserSearch() {
   }
 
   useEffect(() => {
-    if (fromNavbar && !searched) {
+    if (fromNavbar) {
       navbarSearchFunction();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromNavbar, searched]);
 
   return (
-      <div
+    <div
       className="d-flex align-items-center justify-content-center"
       style={{
         background: "#f4f6f8",
