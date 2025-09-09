@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import Timer from "../components/Timer";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { NavbarContext } from "../hooks/NavbarContext";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
@@ -20,6 +20,7 @@ export default function EventDetails() {
   });
   const [loaded, setLoaded] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const navigate = useNavigate();
 
   const { userID, timerStart, setTimerStart } = useContext(NavbarContext);
   const { eventId } = useParams();
@@ -54,8 +55,8 @@ export default function EventDetails() {
     if (event.timer) {
       setSeconds(
         (event.timer.hours || 0) * 3600 +
-          (event.timer.minutes || 0) * 60 +
-          (event.timer.seconds || 0)
+        (event.timer.minutes || 0) * 60 +
+        (event.timer.seconds || 0)
       );
     }
     console.log("host: ", event.host);
@@ -141,34 +142,48 @@ export default function EventDetails() {
               </div>
 
               {/* Action Buttons */}
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  onClick={() => setTimerStart(!timerStart)}
-                  className="bg-indigo-500 text-white font-medium py-2 px-4 rounded-xl shadow-md hover:bg-indigo-600 transition"
-                >
-                  {!timerStart ? "Start Timer" : "Pause Timer"}
-                </button>
+              <div className="d-flex justify-content-between">
+                {/* Timer & Join/Leave Buttons */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => setTimerStart(!timerStart)}
+                    className="bg-indigo-500 text-white font-medium py-2 px-4 rounded-xl shadow-md hover:bg-indigo-600 transition"
+                  >
+                    {!timerStart ? "Start Timer" : "Pause Timer"}
+                  </button>
 
-                {!loaded
-                  ? ""
-                  : event.attendees
+                  {!loaded
+                    ? ""
+                    : event.attendees
                       .map((attendee) => attendee.id)
                       .find((element) => userID === element) === undefined ? (
-                    <button
-                      onClick={() => joinLeaveEvent("join")}
-                      className="bg-green-500 text-white font-medium py-2 px-4 rounded-xl shadow-md hover:bg-green-600 transition"
-                    >
-                      Join Event
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => joinLeaveEvent("leave")}
-                      className="bg-red-500 text-white font-medium py-2 px-4 rounded-xl shadow-md hover:bg-red-600 transition"
-                    >
-                      Leave Event
-                    </button>
-                  )}
+                      <button
+                        onClick={() => joinLeaveEvent("join")}
+                        className="bg-green-500 text-white font-medium py-2 px-4 rounded-xl shadow-md hover:bg-green-600 transition"
+                      >
+                        Join Event
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => joinLeaveEvent("leave")}
+                        className="bg-red-500 text-white font-medium py-2 px-4 rounded-xl shadow-md hover:bg-red-600 transition"
+                      >
+                        Leave Event
+                      </button>
+                    )}
+                </div>
+
+                {/* Go Back Button */}
+                <div className="mt-6">
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="bg-teal-500 text-white font-medium py-2 px-4 rounded-xl shadow-md hover:bg-indigo-600 transition"
+                  >
+                    Go Back
+                  </button>
+                </div>
               </div>
+
             </div>
           </div>
         </div>
