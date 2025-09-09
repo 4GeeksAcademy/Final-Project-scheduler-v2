@@ -73,7 +73,7 @@ def post_event_create_route():
     return jsonify({"createdEvent": new_event.serialize()}), 200
 
 
-@api.route('/editEvent/<int:event_id>', methods=['PUT'])
+@api.route('/edit/event/<int:event_id>', methods=['PUT'])
 def post_event_route(event_id):
 
     # do updating in the database

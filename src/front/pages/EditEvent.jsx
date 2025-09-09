@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
 
-export const CreateEvent = () => {
+export const EditEvent = () => {
+    const { eventId } = useParams();
 
     const navigate = useNavigate();
     const [repeatType, setRepeatType] = useState("Daily");
@@ -11,6 +12,7 @@ export const CreateEvent = () => {
     const [timerUsed, setTimerUsed] = useState(false);
     const [timer, setTimer] = useState({ "hours": 0, "minutes": 0, "seconds": 0 });
     const [eventWeekdays, setEventWeekdays] = useState({});
+    const [loaded, setLoaded] = useState();
     const [eventData, setEventData] = useState({
         "date": "",
         "name": "",
@@ -23,8 +25,16 @@ export const CreateEvent = () => {
         "timer": { "hours": 0, "minutes": 0, "seconds": 0 }
     }); // This should be set up with how it is in the database, the current data here is just an example to work with the frame while rudy gets user database info set up
 
-    useEffect(() => {
+    async function fetchevent() {
+        const response = await fetch(`${API_URL}api/events/${eventId}`)
+        const data = await response.json();
+        console.log("event: ", data)
+        setEventData(data.returned_event)
+        setLoaded(true)
+    }
 
+    useEffect(() => {
+        fetchevent()
     }, [repeatType])
 
     function changeEventData(e) {
@@ -72,12 +82,10 @@ export const CreateEvent = () => {
             }
             console.log("sentData: ", sentData)
 
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_URL}api/create/event`, {
-                method: "POST",
+            const response = await fetch(`${API_URL}api/edit/event/${eventId}`, {
+                method: "PUT",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(sentData)
             });
@@ -91,9 +99,9 @@ export const CreateEvent = () => {
                     alert("Something went wrong, please redo everything.")
                 }
             } else {
-                let user_id = eventObj["createdEvent"]["host_id"]
+                let user_id = eventObj["editedEvent"]["host_id"]
                 navigate(`/eventlist/${user_id}`);
-                alert("Event Created!");
+                alert("Event Edited!");
             }
 
         }
@@ -113,7 +121,7 @@ export const CreateEvent = () => {
             <div className="container card border-dark border-opacity-50">
                 <div className="row d-flex justify-content-center p-5">
                     <div className="mt-5 col-4">
-                        <h1 className="fs-1">Create Event:</h1>
+                        <h1 className="fs-1">Edit Event:</h1>
                         <div className="mb-3">
                             <label className="form-label">Event Name:</label>
                             <input type="text" className="form-control w-50 border-dark border-opacity-50" id="name" value={eventData.name} onChange={changeEventData} />

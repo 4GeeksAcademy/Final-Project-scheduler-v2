@@ -79,7 +79,12 @@ export default function EventList() {
               <div className="card container fs-4 m-0" style={{ maxWidth: "400px" }}>{event.name} </div>
               <Link to={`/events/${event.id}`}>
                 <button className="ms-3 bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
-                  more
+                  More Details
+                </button>
+              </Link>
+              <Link to={`/edit/event/${event.id}`}>
+                <button className="ms-3 bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
+                  Edit Event
                 </button>
               </Link>
               <button onClick={() => deleteEvent(event.id)} className="ms-3 bg-gray-300 text-gray-800 font-semibold py-2 px-3 rounded-xl shadow-lg hover:bg-gray-400 transition-colors duration-200">
