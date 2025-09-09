@@ -70,25 +70,27 @@ export default function EventList() {
 
 
   return (
-    <div>
-      <div className="max-w-4xl mx-auto mt-24 px-4 pb-24">
+    <div className="max-w-4xl mx-auto mt-24 px-4 pb-24">
+      {/* This div is for containing the list of events */}
+      <div>
         <h3 className="text-2xl font-bold mb-6 text-gray-800">List of Events</h3>
+        {/*This huge thing gets either a mapped list of events or tells user there's no events */}
         {
           (event.length === 0) ? (<div className="mt-2 text-gray-600">No events planned. Please add an event.</div>) : (event.map((event, i) => (
-            <div key={i} className="flex items-center justify-between p-4 rounded-2xl shadow-md mb-3 transition-transform hover:scale-[1.01]" style={{ backgroundColor: event.color }}>
-              <div className="text-lg font-medium text-gray-900">{event.name}</div>
+            <div key={i} className="flex items-center justify-between p-4 rounded-2xl shadow mb-3 transition-transform hover:scale-[1.01]" style={{ backgroundColor: event.color }}>
+              <div className="text-lg font-medium text-gray-900 bg-light rounded p-2 border-dark border-1 border-opacity-25 shadow">{event.name}</div>
               <div className="flex">
                 <Link to={`/events/${event.id}`}>
-                  <button className="ml-3 bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-xl shadow-sm hover:bg-gray-300 transition">
+                  <button className="ml-3 bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-xl shadow hover:bg-gray-300 transition">
                     More Details
                   </button>
                 </Link>
                 <Link to={`/edit/event/${event.id}`}>
-                  <button className="ml-3 bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-xl shadow-sm hover:bg-gray-300 transition">
+                  <button className="ml-3 bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-xl shadow hover:bg-gray-300 transition">
                     Edit Event
                   </button>
                 </Link>
-                <button onClick={() => deleteEvent(event.id)} className="ml-3 bg-red-200 text-red-700 font-medium py-2 px-4 rounded-xl shadow-sm hover:bg-red-300 transition">
+                <button onClick={() => deleteEvent(event.id)} className="ml-3 bg-red-200 text-red-700 font-medium py-2 px-4 rounded-xl shadow hover:bg-red-300 transition">
                   Delete
                 </button>
               </div>
@@ -96,7 +98,9 @@ export default function EventList() {
           ))
           )
         }
+        {/*Mapped listed events ends here */}
       </div>
+      {/* The list of events div ends here */}
 
       {/* Bottom Section Box */}
       <div className="mt-10 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">

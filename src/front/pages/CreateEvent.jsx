@@ -186,7 +186,11 @@ export const CreateEvent = () => {
                             </div>) : (<span></span>)}
 
                         </form>
-                        <button onClick={() => sendEventData()} className="btn btn-primary">Submit</button>
+                        <div className="d-flex justify-content-between">
+                            <button onClick={() => sendEventData()} className="btn btn-primary">Submit</button>
+                            <button onClick={() => navigate(-1)} className="btn btn-primary">Go Back</button>
+                        </div>
+
 
                     </div>
                 </div>
