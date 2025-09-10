@@ -134,7 +134,7 @@ export const EditEvent = () => {
                                     aria-describedby="publicHelp"
                                     style={{ background: "#7FC1E0", color: "white" }}
                                 >
-                                    {(eventVisibility === "Public") ? "Public" : "Private"}
+                                    {eventData.visibility}
                                 </button>
                                 <ul className="dropdown-menu border-dark border-opacity-50">
                                     <li><button className="dropdown-item" onClick={() => setEventVisibility("Public")}>Public</button></li>
