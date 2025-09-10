@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -13,6 +13,8 @@ function parseJwt(token) {
 
 const SettingsPage = () => {
     const navigate = useNavigate();
+
+    const [authed, setAuthed] = useState(null);
     const [userId, setUserId] = useState(null);
 
     const [name, setName] = useState("");
@@ -28,9 +30,15 @@ const SettingsPage = () => {
     const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setAuthed(false);
+            return;
+        }
+        setAuthed(true);
+
         const fetchUser = async () => {
             try {
-                const token = localStorage.getItem("token");
                 const res = await fetch(`${API_URL}/api/me`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -43,6 +51,7 @@ const SettingsPage = () => {
                 setIsPublic(!!data.is_public);
             } catch (err) {
                 console.error(err);
+                setAuthed(false);
             }
         };
         fetchUser();
@@ -64,8 +73,7 @@ const SettingsPage = () => {
                 first_name: name,
                 last_name: lastName,
                 email: email,
-                is_public: isPublic,
-                // ...(editPhoto && { profile_photo: editPhoto }),
+                is_public: isPublic
             };
 
             const token = localStorage.getItem("token");
@@ -75,11 +83,11 @@ const SettingsPage = () => {
                     "Content-Type": "application/json",
                     ...(token && { Authorization: `Bearer ${token}` })
                 },
-                body: JSON.stringify(updatedUser),
+                body: JSON.stringify(updatedUser)
             });
 
             if (!res.ok) {
-                const errData = await res.json();
+                const errData = await res.json().catch(() => ({}));
                 setErrorMsg(errData.msg || "Failed to update user");
                 return;
             }
@@ -103,6 +111,63 @@ const SettingsPage = () => {
         setEditPhoto(profilePhoto);
         setIsEditing(false);
     };
+
+    if (authed === false) {
+        return (
+            <div
+                className="d-flex align-items-start justify-content-center"
+                style={{
+                    background: "#f4f6f8",
+                    padding: "2rem 1rem",
+                    marginTop: "56px",
+                    minHeight: "100vh",
+                }}
+            >
+                <div className="w-100" style={{ maxWidth: "720px" }}>
+                    <div className="card shadow-lg border-0" style={{ borderRadius: "1rem", overflow: "hidden" }}>
+                        <div className="card-header bg-white border-0 text-center py-4">
+                            <h1 className="fw-bold mb-0 fs-2" style={{ color: "#28779a" }}>Settings</h1>
+                        </div>
+                        <div className="card-body p-4 p-md-5 bg-white text-center">
+                            <p className="text-muted mb-4">You need an account to access Settings.</p>
+                            <div className="d-flex justify-content-center gap-2">
+                                <Link to="/">
+                                    <button className="btn rounded-pill px-4" style={{ background: "#7FC1E0", color: "white" }}>
+                                        Sign In
+                                    </button>
+                                </Link>
+                                <Link to="/signup">
+                                    <button className="btn rounded-pill px-4" style={{ border: "1px solid #7FC1E0", color: "#28779a", background: "transparent" }}>
+                                        Sign Up
+                                    </button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (authed === null) {
+        return (
+            <div
+                className="d-flex align-items-center justify-content-center"
+                style={{
+                    background: "#f4f6f8",
+                    padding: "2rem 1rem",
+                    marginTop: "56px",
+                    minHeight: "100vh",
+                }}
+            >
+                <div className="text-center my-5">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading…</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div

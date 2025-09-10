@@ -6,7 +6,6 @@ import TimeTidyLogoImageUrl from "../assets/img/updatedLogoCropped.png";
 export const Navbar = () => {
   const { userID, searchbar, setSearchbar, setFromNavbar } = useContext(NavbarContext);
 
-  // Optional guard so you don't end up at /profile/-1
   const safeUserID =
     userID &&
     Number(userID) > 0 &&
@@ -17,7 +16,7 @@ export const Navbar = () => {
   const closeOffcanvas = () => {
     const el = document.getElementById("offcanvasNavbar");
     if (!el) return;
-    const bs = window.bootstrap; // requires Bootstrap JS bundle loaded
+    const bs = window.bootstrap; 
     if (!bs?.Offcanvas) return;
     const inst = bs.Offcanvas.getInstance(el) || new bs.Offcanvas(el);
     inst?.hide();
