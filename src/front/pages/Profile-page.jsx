@@ -1,4 +1,3 @@
-// src/pages/Profile-page.jsx
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
@@ -68,7 +67,7 @@ const ProfilePage = () => {
   }, [year]);
 
   useEffect(() => {
-    if (!safeUserId) return;              // ⬅️ skip when invalid
+    if (!safeUserId) return;              
     (async () => {
       try {
         const token = localStorage.getItem("token");
@@ -89,7 +88,7 @@ const ProfilePage = () => {
   }, [safeUserId]);
 
   useEffect(() => {
-    if (!safeUserId) return;              // ⬅️ skip when invalid
+    if (!safeUserId) return;              
     (async () => {
       try {
         const token = localStorage.getItem("token");

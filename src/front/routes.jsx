@@ -1,4 +1,3 @@
-// src/router.jsx
 import {
   createBrowserRouter,
   createRoutesFromElements,
