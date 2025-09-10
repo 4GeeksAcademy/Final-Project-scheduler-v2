@@ -54,7 +54,7 @@ const ProfilePage = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://calendarific.com/api/v2/holidays?&api_key=3CRFaZmG1Jgk2FfIxOQBEfPhznPP7ckL&country=US&year=${year}`
+          `https://calendarific.com/api/v2/holidays?&api_key=QX3EdiJwf3BCKLjhNdbVXRiOROzl7GQ2&country=US&year=${year}`
         );
         const data = await res.json();
         setHolidays(data.response?.holidays || []);
@@ -67,7 +67,7 @@ const ProfilePage = () => {
   }, [year]);
 
   useEffect(() => {
-    if (!safeUserId) return;              
+    if (!safeUserId) return;
     (async () => {
       try {
         const token = localStorage.getItem("token");
@@ -88,7 +88,7 @@ const ProfilePage = () => {
   }, [safeUserId]);
 
   useEffect(() => {
-    if (!safeUserId) return;              
+    if (!safeUserId) return;
     (async () => {
       try {
         const token = localStorage.getItem("token");
@@ -266,9 +266,8 @@ const ProfilePage = () => {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div
-                          className={`h-3 rounded-full transition-all duration-300 ${
-                            complete ? "bg-green-500" : "bg-[#7FC1E0]"
-                          }`}
+                          className={`h-3 rounded-full transition-all duration-300 ${complete ? "bg-green-500" : "bg-[#7FC1E0]"
+                            }`}
                           style={{ width: `${percent}%` }}
                         />
                       </div>

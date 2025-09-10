@@ -12,7 +12,7 @@ export const EditEvent = () => {
     const [timerUsed, setTimerUsed] = useState(false);
     const [timer, setTimer] = useState({ "hours": 0, "minutes": 0, "seconds": 0 });
     const [eventWeekdays, setEventWeekdays] = useState({});
-    const [loaded, setLoaded] = useState();
+    const [loaded, setLoaded] = useState(false);
     const [eventData, setEventData] = useState({
         "date": "",
         "name": "",
@@ -35,6 +35,14 @@ export const EditEvent = () => {
     useEffect(() => {
         fetchevent()
     }, [repeatType])
+
+
+
+    useEffect(() => {
+        if (eventData.repeat != null) {
+            setEventWeekdays(eventData.repeat)
+        }
+    }, [eventData])
 
     function changeEventData(e) {
         setEventData((oldEventData) => {
@@ -75,7 +83,6 @@ export const EditEvent = () => {
                 "visibility": eventVisibility,
                 "timer": timerUsed ? timer : { "hours": 0, "minutes": 0, "seconds": 0 }
             }
-
             const response = await fetch(`${API_URL}api/edit/event/${eventId}`, {
                 method: "PUT",
                 headers: {
@@ -101,7 +108,7 @@ export const EditEvent = () => {
 
     let weeklyCheckboxes = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday"].map((days, index) => (
         <div className="mb-3 mx-2 form-check" key={index}>
-            <input type="checkbox" className="form-check-input border-dark border-opacity-50" id={days} onChange={changeWeekdays} />
+            <input type="checkbox" className="form-check-input border-dark border-opacity-50" checked={eventWeekdays[days] || false} id={days} onChange={changeWeekdays} />
             <label className="form-check-label ">{days}</label>
         </div>));
 
@@ -134,7 +141,7 @@ export const EditEvent = () => {
                                     aria-describedby="publicHelp"
                                     style={{ background: "#7FC1E0", color: "white" }}
                                 >
-                                    {(eventVisibility === "Public") ? "Public" : "Private"}
+                                    {eventData.visibility}
                                 </button>
                                 <ul className="dropdown-menu border-dark border-opacity-50">
                                     <li><button className="dropdown-item" onClick={() => setEventVisibility("Public")}>Public</button></li>
