@@ -3,161 +3,204 @@ import Timer from "../components/Timer";
 import { Link, useParams } from "react-router-dom";
 import { HslColorPicker } from "react-colorful";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function EventList() {
   const { userId } = useParams();
-  const [event, setEvent] = useState([])
-  const [attendingevent, setAttendingEvent] = useState([])
-  const [selectedeventtype, setSelectedEventType] = useState({})
+  const [event, setEvent] = useState([]);
+  const [attendingevent, setAttendingEvent] = useState([]);
+  const [selectedeventtype, setSelectedEventType] = useState({});
   const [color, setColor] = useState({ h: 0, s: 100, l: 50 });
 
   async function fetchUserEvents() {
-    const response = await fetch(`${API_URL}api/eventlist/${userId}`)
+    const response = await fetch(`${API_URL}api/eventlist/${userId}`);
     const data = await response.json();
-    console.log("event: ", data)
-    setEvent(data.returned_event)
+    setEvent(data.returned_event);
   }
-  //length
+
   async function deleteEvent(event_id) {
     const response = await fetch(`${API_URL}api/delete/event/${event_id}`, {
-      method: "DELETE"
-    })
+      method: "DELETE",
+    });
     const data = await response.json();
-    console.log("event: ", data)
-    setEvent(data.remaining_events)
+    setEvent(data.remaining_events);
   }
 
   async function saveEventColor(targetId) {
-    if (!selectedeventtype) {
-      alert("Please select an event type first!");
+    if (!selectedeventtype || !targetId) {
+      alert("Please select an event first!");
       return;
     }
-
     const payload = {
-      "eventId": targetId,
-      "color": `hsl(${color.h}, ${color.s}%, ${color.l}%)`,
+      eventId: targetId,
+      color: `hsl(${color.h}, ${color.s}%, ${color.l}%)`,
     };
-    console.log("eventId", targetId)
-    const response = await fetch(
-      `${API_URL}api/eventtype/color`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
-    const fetchresponse = await response.json()
-
+    const response = await fetch(`${API_URL}api/eventtype/color`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const fetchresponse = await response.json();
     if (response.ok) {
-      console.log(`Saved color for ${fetchresponse.name}`);
       fetchUserEvents();
     }
   }
 
-
-  // async function fetchUserAttendingEvents() {
-  //   const response = await fetch(`${API_URL}api/attendingeventlist/${userId}`)
-  //   const data = await response.json();
-  //   console.log("event: ", data)
-  //   setAttendingEvent(data.returned_event)
-  // }
   useEffect(() => {
-    fetchUserEvents()
-    // fetchUserAttendingEvents()
+    fetchUserEvents();
   }, []);
 
-
-
   return (
-    <div className="max-w-4xl mx-auto mt-24 px-4 pb-24">
-      {/* This div is for containing the list of events */}
-      <div>
-        <h3 className="text-2xl font-bold mb-6 text-gray-800">List of Events</h3>
-        {/*This huge thing gets either a mapped list of events or tells user there's no events */}
-        {
-          (event.length === 0) ?
-            (<div className="mt-2 text-gray-600">No events planned. Please add an event.</div>)
-            : (event.map((event, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-2xl shadow mb-3 transition-transform hover:scale-[1.01]" style={{ backgroundColor: event.color }}>
-                <div className="text-lg font-medium text-gray-900 bg-light rounded p-2 shadow bg-opacity-50">{event.name}</div>
-                <div className="flex">
-                  <Link to={`/events/${event.id}`}>
-                    <button className="ml-3 bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-xl shadow hover:bg-gray-300 transition">
-                      More Details
-                    </button>
-                  </Link>
-                  <Link to={`/edit/event/${event.id}`}>
-                    <button className="ml-3 bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-xl shadow hover:bg-gray-300 transition">
-                      Edit Event
-                    </button>
-                  </Link>
-                  <button onClick={() => deleteEvent(event.id)} className="ml-3 bg-red-200 text-red-700 font-medium py-2 px-4 rounded-xl shadow hover:bg-red-300 transition">
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-            )
-        }
-        {/*Mapped listed events ends here */}
-      </div>
-      {/* The list of events div ends here */}
-
-      {/* Bottom Section Box */}
-      <div className="mt-10 p-6 bg-white rounded-2xl shadow border border-gray-200">
-        <Link to={"/create/event"}>
-          <button className="w-full bg-indigo-500 text-white py-2 px-6 rounded-full shadow hover:bg-indigo-600 transition">
-            Create a New Event
-          </button>
-        </Link>
-
-        <div className="mt-8">
-          <p className="font-medium text-gray-700 mb-2">Select an event to highlight:</p>
-          <div className="relative inline-block">
-            <button
-              className="bg-indigo-500 text-white py-2 px-6 rounded-full shadow hover:bg-indigo-600 transition dropdown-toggle"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              {selectedeventtype.name || "Choose Event"}
-            </button>
-            <ul className="dropdown-menu mt-2 rounded-xl shadow">
-              {event.map((event, i) => (
-                <button
-                  key={i}
-                  className="dropdown-item hover:bg-gray-100 px-4 py-2 rounded-lg"
-                  onClick={() => setSelectedEventType(event)}
-                >
-                  {event.name}
-                </button>
-              ))}
-            </ul>
+    <div
+      className="d-flex align-items-start justify-content-center"
+      style={{
+        background: "#f4f6f8",
+        padding: "2rem 1rem",
+        marginTop: "56px",
+        minHeight: "100vh",
+      }}
+    >
+      <div className="w-100" style={{ maxWidth: "900px" }}>
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-6">
+          <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
+            <h3 className="m-0" style={{ fontWeight: 800, color: "#1f2937", fontSize: "1.5rem" }}>
+              List of Events
+            </h3>
+            <Link to={"/create/event"}>
+              <button
+                type="button"
+                className="rounded-full fw-semibold px-4 py-2"
+                style={{ background: "#7FC1E0", color: "white" }}
+              >
+                Create a New Event
+              </button>
+            </Link>
           </div>
+
+          {event.length === 0 ? (
+            <div className="text-center text-muted p-4">
+              No events planned. Please add an event.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {event.map((ev, i) => (
+                <div
+                  key={i}
+                  className="d-flex align-items-center justify-content-between p-3 rounded-3 shadow-sm"
+                  style={{
+                    backgroundColor: ev.color || "#f9fafb",
+                    transition: "transform .12s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.01)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1.0)")}
+                >
+                  <div
+                    className="fw-semibold"
+                    style={{
+                      fontSize: "1rem",
+                      color: "#111827",
+                      background: "rgba(255,255,255,.75)",
+                      padding: "6px 10px",
+                      borderRadius: "10px",
+                      boxShadow: "0 1px 2px rgba(0,0,0,.06)",
+                    }}
+                  >
+                    {ev.name}
+                  </div>
+
+                  <div className="d-flex flex-wrap">
+                    <Link to={`/events/${ev.id}`}>
+                      <button
+                        type="button"
+                        className="rounded-pill fw-semibold px-3 py-2 me-2 mb-2 bg-gray-200 text-gray-800 shadow hover:bg-gray-300 transition"
+                      >
+                        More Details
+                      </button>
+                    </Link>
+
+                    <Link to={`/edit/event/${ev.id}`}>
+                      <button
+                        type="button"
+                        className="rounded-pill fw-semibold px-3 py-2 me-2 mb-2 bg-gray-200 text-gray-800 shadow hover:bg-gray-300 transition"
+                      >
+                        Edit Event
+                      </button>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => deleteEvent(ev.id)}
+                      className="rounded-pill fw-semibold px-3 py-2 mb-2"
+                      style={{ background: "#fecaca", color: "#991b1b" }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="mt-8">
-          <HslColorPicker color={color} onChange={setColor} />
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-6 mt-4">
+          <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
+            <h4 className="m-0" style={{ fontWeight: 800, color: "#1f2937", fontSize: "1.25rem" }}>
+              Highlight an Event
+            </h4>
+            <div className="dropdown">
+              <button
+                className="btn rounded-pill fw-semibold px-4 py-2 dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{ background: "#7FC1E0", color: "white" }}
+              >
+                {selectedeventtype.name || "Choose Event"}
+              </button>
+              <ul className="dropdown-menu shadow-sm rounded-3 border-0">
+                {event.map((ev, i) => (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      className="dropdown-item py-2"
+                      onClick={() => setSelectedEventType(ev)}
+                    >
+                      {ev.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
-          <p className="mt-4 font-medium text-gray-700">
-            Selected Highlight Color:
-            <span
-              className="inline-block w-10 h-10 ml-2 rounded-full border border-gray-300 shadow"
-              style={{
-                backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)`,
-              }}
-            />
-          </p>
-
-          <button
-            className="mt-4 w-full bg-indigo-500 text-white py-2 px-6 rounded-full shadow hover:bg-indigo-600 transition"
-            onClick={() => saveEventColor(selectedeventtype.id)}
-          >
-            Save Highlight Color for {selectedeventtype.name || "event type"}
-          </button>
+          <div className="mt-2">
+            <HslColorPicker color={color} onChange={setColor} />
+            <p className="mt-3 fw-semibold" style={{ color: "#374151" }}>
+              Selected Highlight Color:
+              <span
+                className="d-inline-block ms-2"
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "9999px",
+                  border: "1px solid #e5e7eb",
+                  boxShadow: "0 1px 2px rgba(0,0,0,.06)",
+                  backgroundColor: `hsl(${color.h}, ${color.s}%, ${color.l}%)`,
+                  verticalAlign: "middle",
+                }}
+              />
+            </p>
+            <button
+              type="button"
+              className="w-100 rounded-pill fw-semibold px-4 py-2 mt-2"
+              style={{ background: "#7FC1E0", color: "white" }}
+              onClick={() => saveEventColor(selectedeventtype.id)}
+            >
+              Save Highlight Color{selectedeventtype.name ? ` for ${selectedeventtype.name}` : ""}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
