@@ -19,7 +19,7 @@ const getCurrentWeek = (weekOffset = 0) => {
 };
 
 const ProfilePage = () => {
-  const { userID } = useContext(NavbarContext);
+  const { userID, setUserID } = useContext(NavbarContext); // ⬅️ add setUserID
   const { userId } = useParams();
   const navigate = useNavigate();
 
@@ -37,6 +37,8 @@ const ProfilePage = () => {
   const [weekOffset, setWeekOffset] = useState(0);
 
   const week = getCurrentWeek(weekOffset);
+  const isAuthenticated = !!localStorage.getItem("token");
+  const isOwner = isAuthenticated && String(userID) === String(userId);
 
   useEffect(() => {
     const newYear = week[0].getFullYear();
@@ -56,7 +58,6 @@ const ProfilePage = () => {
         const data = await res.json();
         setHolidays(data.response?.holidays || []);
       } catch {
-        // silent fail; keep UI stable
       } finally {
         setLoading(false);
       }
@@ -78,7 +79,6 @@ const ProfilePage = () => {
         setLastName(data.last_name || "");
         setEmail(data.email || "");
         setUsername(data.username || "");
-        // if API returns a profile photo url, use it:
         if (data.profile_photo_url) setProfilePhoto(data.profile_photo_url);
       } catch (err) {
         console.error(err);
@@ -109,7 +109,17 @@ const ProfilePage = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("username");
-    navigate("/");
+
+    // ⬇️ Clear context + page state so nothing lingers
+    setUserID?.(null);
+    setName("");
+    setLastName("");
+    setEmail("");
+    setUsername("");
+    setProfilePhoto(defaultProfilePhoto);
+    setGoals([]);
+
+    navigate("/", { replace: true });
   };
 
   const holidaysByDate = {};
@@ -149,9 +159,7 @@ const ProfilePage = () => {
       }}
     >
       <div className="w-100" style={{ maxWidth: "1100px" }}>
-        {/* Top: Profile + Goals */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Profile Card */}
           <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-6">
             <div className="text-center">
               <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 tracking-tight mb-4">
@@ -188,7 +196,7 @@ const ProfilePage = () => {
                   </button>
                 </Link>
 
-                {String(userID) === String(userId) && (
+                {isOwner ? (
                   <button
                     onClick={handleSignOut}
                     className="bg-red-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-red-600 transition-colors duration-200"
@@ -196,18 +204,26 @@ const ProfilePage = () => {
                   >
                     Sign Out
                   </button>
-                )}
+                ) : !isAuthenticated ? (
+                  <Link to="/">
+                    <button
+                      className="bg-[#7FC1E0] text-white font-semibold py-2 px-4 rounded-full hover:bg-[#5fa9cb] transition-colors duration-200"
+                      title="Sign in"
+                    >
+                      Sign In
+                    </button>
+                  </Link>
+                ) : null}
               </div>
             </div>
           </div>
 
-          {/* Goals Card */}
           <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800">
                 Goal Progress
               </h2>
-              {String(userID) === String(userId) && (
+              {isOwner && (
                 <Link to="/goals">
                   <button className="bg-[#7FC1E0] text-white font-semibold py-2 px-4 rounded-full hover:bg-[#5fa9cb] transition-colors duration-200">
                     Manage
@@ -254,7 +270,6 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Week at a Glance */}
         <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-6 mt-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800">
@@ -319,6 +334,7 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
 
 
 
