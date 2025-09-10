@@ -13,8 +13,6 @@ function parseJwt(token) {
 
 const SettingsPage = () => {
     const navigate = useNavigate();
-    // userId from localStorage
-    // const userId = localStorage.getItem("user_id");
     const [userId, setUserId] = useState(null);
 
     const [name, setName] = useState("");
@@ -23,34 +21,26 @@ const SettingsPage = () => {
     const [profilePhoto, setProfilePhoto] = useState(null);
 
     const [isEditing, setIsEditing] = useState(false);
-    const [editName, setEditName] = useState("");
-    const [editEmail, setEditEmail] = useState("");
     const [editPhoto, setEditPhoto] = useState(null);
 
     const [isPublic, setIsPublic] = useState(true);
-    const [editIsPublic, setEditIsPublic] = useState(isPublic);
 
     const [errorMsg, setErrorMsg] = useState("");
 
-    // User data from backend
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const token = localStorage.getItem("token");
                 const res = await fetch(`${API_URL}/api/me`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 if (!res.ok) throw new Error("Failed to fetch user");
                 const data = await res.json();
                 setUserId(data.id);
                 setName(`${data.first_name}`);
-                setEditName(`${data.first_name} ${data.last_name}`);
                 setLastName(data.last_name);
                 setEmail(data.email);
-                setEditEmail(data.email);
-                // Set other fields as needed
+                setIsPublic(!!data.is_public);
             } catch (err) {
                 console.error(err);
             }
@@ -70,18 +60,16 @@ const SettingsPage = () => {
     const handleSave = async () => {
         setErrorMsg("");
         try {
-            const [first_name, ...last_name] = editName.trim().split(" ");
             const updatedUser = {
                 first_name: name,
                 last_name: lastName,
                 email: email,
-                is_public: editIsPublic,
-                // Does backend support photo?
-                //...(editPhoto && { profile_photo: editPhoto }),
+                is_public: isPublic,
+                // ...(editPhoto && { profile_photo: editPhoto }),
             };
 
             const token = localStorage.getItem("token");
-            const res = await fetch(`${API_URL}/api/users/${userId}`, { // <-- plural 'users'
+            const res = await fetch(`${API_URL}/api/users/${userId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -95,12 +83,12 @@ const SettingsPage = () => {
                 setErrorMsg(errData.msg || "Failed to update user");
                 return;
             }
-            console.log("name:", name);
 
             const data = await res.json();
-            setName(`${data.first_name} ${data.last_name}`);
+            setName(`${data.first_name}`);
+            setLastName(data.last_name);
             setEmail(data.email);
-            setIsPublic(data.is_public);
+            setIsPublic(!!data.is_public);
             setProfilePhoto(data.profile_photo || null);
             setIsEditing(false);
 
@@ -112,95 +100,166 @@ const SettingsPage = () => {
     };
 
     const handleCancel = () => {
-        setEditName(name);
-        setEditEmail(email);
         setEditPhoto(profilePhoto);
-        setEditIsPublic(isPublic);
         setIsEditing(false);
     };
 
     return (
-        <div className="mt-3" style={{ padding: "40px" }}>
-            <h1>Settings</h1>
-            <button className="btn btn-dark rounded-pill" onClick={() => navigate(`/profile/${userId}`)} style={{ marginBottom: "20px" }}>
-                Back to Profile
-            </button>
-
-            <div style={{ marginBottom: "20px" }}>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={isPublic}
-                        onChange={async (e) => {
-                            const newValue = e.target.checked;
-                            setIsPublic(newValue);
-
-                            try {
-                                const token = localStorage.getItem("token");
-                                await fetch(`${API_URL}/api/users/${userId}`, {
-                                    method: "PATCH",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        ...(token && { Authorization: `Bearer ${token}` })
-                                    },
-                                    body: JSON.stringify({ is_public: newValue }),
-                                });
-                            } catch (err) {
-                                console.error(err);
-                            }
-                        }}
-                        style={{ marginRight: "8px" }}
-                    />
-                    Make my profile public (others can see your profile box and progress bars)
-                </label>
-            </div>
-
-            {!isEditing ? (
-                <button className="btn btn-dark rounded-pill" onClick={() => setIsEditing(true)}>Edit Profile</button>
-            ) : (
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        minHeight: "400px",
-                        height: "60vh",
-                        justifyContent: "flex-start",
-                        position: "relative"
-                    }}
-                >
-                    {/* ...edit boxes... */}
-                    <div>
-                        <label>Name:</label>
-                        <input className="input-group-text" value={name} onChange={e => setName(e.target.value)} />
+        <div
+            className="d-flex align-items-start justify-content-center"
+            style={{
+                background: "#f4f6f8",
+                padding: "2rem 1rem",
+                marginTop: "56px",
+                minHeight: "100vh",
+            }}
+        >
+            <div className="w-100" style={{ maxWidth: "720px" }}>
+                <div className="card shadow-lg border-0" style={{ borderRadius: "1rem", overflow: "hidden" }}>
+                    <div className="card-header bg-white border-0 text-center py-4">
+                        <h1 className="fw-bold mb-0 fs-2" style={{ color: "#28779a" }}>Settings</h1>
                     </div>
-                    <div>
-                        <label>Last Name:</label>
-                        <input className="input-group-text" value={lastName} onChange={e => setLastName(e.target.value)} />
-                    </div>
-                    <div>
-                        <label>Email:</label>
-                        <input className="input-group-text" value={email} onChange={e => setEmail(e.target.value)} />
-                    </div>
-                    <div className="mt-3">
-                        <label className="me-3">Photo:</label>
-                        <input type="file" accept="image/*" onChange={handlePhotoChange} />
-                        {editPhoto && <img src={editPhoto} alt="Preview" style={{ width: 80, borderRadius: "50%" }} />}
-                    </div>
-                    <div style={{ flex: 1 }} />
 
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
-                        <button className="btn btn-dark rounded-pill" onClick={() => handleSave()}>Save</button>
-                        <button className="btn btn-dark rounded-pill" onClick={handleCancel}>Cancel</button>
+                    <div className="card-body p-4 p-md-5 bg-white">
+                        <div className="d-flex justify-content-start mb-3">
+                            <button
+                                className="btn rounded-pill px-4"
+                                onClick={() => navigate(`/profile/${userId}`)}
+                                style={{ border: "1px solid #7FC1E0", color: "#28779a", background: "transparent" }}
+                            >
+                                Back to Profile
+                            </button>
+                        </div>
+
+                        <div className="mb-4">
+                            <div className="form-check form-switch">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id="publicSwitch"
+                                    checked={isPublic}
+                                    onChange={async (e) => {
+                                        const newValue = e.target.checked;
+                                        setIsPublic(newValue);
+                                        try {
+                                            const token = localStorage.getItem("token");
+                                            await fetch(`${API_URL}/api/users/${userId}`, {
+                                                method: "PATCH",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                    ...(token && { Authorization: `Bearer ${token}` })
+                                                },
+                                                body: JSON.stringify({ is_public: newValue }),
+                                            });
+                                        } catch (err) {
+                                            console.error(err);
+                                        }
+                                    }}
+                                />
+                                <label className="form-check-label ms-2" htmlFor="publicSwitch">
+                                    Make my profile public (others can see your profile box and progress bars)
+                                </label>
+                            </div>
+                        </div>
+
+                        {!isEditing ? (
+                            <button
+                                className="btn rounded-pill px-4"
+                                onClick={() => setIsEditing(true)}
+                                style={{ background: "#7FC1E0", color: "white" }}
+                            >
+                                Edit Profile
+                            </button>
+                        ) : (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    minHeight: "400px",
+                                    height: "60vh",
+                                    justifyContent: "flex-start",
+                                    position: "relative"
+                                }}
+                            >
+                                <div className="mb-3">
+                                    <label className="form-label">First Name</label>
+                                    <input
+                                        className="form-control rounded-pill"
+                                        value={name}
+                                        onChange={e => setName(e.target.value)}
+                                        placeholder="First name"
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Last Name</label>
+                                    <input
+                                        className="form-control rounded-pill"
+                                        value={lastName}
+                                        onChange={e => setLastName(e.target.value)}
+                                        placeholder="Last name"
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Email</label>
+                                    <input
+                                        type="email"
+                                        className="form-control rounded-pill"
+                                        value={email}
+                                        onChange={e => setEmail(e.target.value)}
+                                        placeholder="name@example.com"
+                                    />
+                                </div>
+                                <div className="mt-2">
+                                    <label className="form-label me-3">Photo</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="form-control"
+                                        onChange={handlePhotoChange}
+                                    />
+                                    {editPhoto && (
+                                        <img
+                                            src={editPhoto}
+                                            alt="Preview"
+                                            style={{ width: 80, borderRadius: "50%", marginTop: 10 }}
+                                        />
+                                    )}
+                                </div>
+
+                                <div style={{ flex: 1 }} />
+
+                                <div className="d-flex justify-content-end gap-2 mt-3">
+                                    <button
+                                        className="btn rounded-pill px-4"
+                                        onClick={handleSave}
+                                        style={{ background: "#7FC1E0", color: "white" }}
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        className="btn rounded-pill px-4"
+                                        onClick={handleCancel}
+                                        style={{ border: "1px solid #7FC1E0", color: "#28779a", background: "transparent" }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mt-4">
+                            <strong>Profile is currently: </strong>
+                            {isPublic ? "Public" : "Private"}
+                        </div>
+
+                        {errorMsg && (
+                            <div className="alert alert-danger mt-3" role="alert">
+                                {errorMsg}
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
-            <div style={{ marginTop: "20px" }}>
-                <strong>Profile is currently: </strong>
-                {isPublic ? "Public" : "Private"}
             </div>
-            {errorMsg && (
-                <div style={{ color: "red", marginTop: "10px" }}>{errorMsg}</div>
-            )}
         </div>
     );
 };

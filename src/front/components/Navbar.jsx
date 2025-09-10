@@ -1,84 +1,128 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { NavbarContext } from "../hooks/NavbarContext.jsx";
 import TimeTidyLogoImageUrl from "../assets/img/updatedLogoCropped.png";
 
-
 export const Navbar = () => {
+  const { userID, searchbar, setSearchbar, setFromNavbar } = useContext(NavbarContext);
 
-	const { userID, searchbar, setSearchbar, setFromNavbar } = useContext(NavbarContext);
+  return (
+    <nav className="navbar navbar-expand-lg bg-white shadow-sm fixed-top">
+      <div className="container-fluid">
+        {/* Logo */}
+        <Link className="navbar-brand d-flex align-items-center" to="/">
+          <img
+            src={TimeTidyLogoImageUrl}
+            alt="Time Tidy"
+            style={{ maxHeight: "45px", objectFit: "contain" }}
+          />
+        </Link>
 
-	return (
-		<nav className="navbar bg-body-tertiary fixed-top">
-			<div className="container-fluid">
-				<Link className="navbar-brand " to="/"><img src={TimeTidyLogoImageUrl} alt="Time Tidy" style={{ maxWidth: "155px" }} /></Link>
+        {/* Toggler */}
+        <button
+          className="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasNavbar"
+          aria-controls="offcanvasNavbar"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
+        {/* Offcanvas */}
+        <div
+          className="offcanvas offcanvas-end"
+          tabIndex="-1"
+          id="offcanvasNavbar"
+          aria-labelledby="offcanvasNavbarLabel"
+        >
+          <div className="offcanvas-header border-bottom">
+            <h5 className="offcanvas-title fw-bold text-primary" id="offcanvasNavbarLabel">
+              Menu
+            </h5>
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
 
-				<button
-					className="navbar-toggler"
-					type="button"
-					data-bs-toggle="offcanvas"
-					data-bs-target="#offcanvasNavbar"
-					aria-controls="offcanvasNavbar"
-					aria-label="Toggle navigation"
-				>
-					<span className="navbar-toggler-icon"></span>
-				</button>
+          <div className="offcanvas-body d-flex align-items-center">
+            {/* Nav links aligned right */}
+            <ul className="navbar-nav ms-auto pe-3">
+              <li className="nav-item">
+                <Link className="nav-link fw-semibold" to="/">
+                  Home
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link fw-semibold" to={`/profile/${userID}`}>
+                  My Profile
+                </Link>
+              </li>
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle fw-semibold"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Navigate
+                </a>
+                <ul className="dropdown-menu shadow-sm rounded-3 border-0">
+                  <li>
+                    <Link className="dropdown-item" to="/goals">
+                      My Goals
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to={`/eventlist/${userID}`}>
+                      My Events
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/favoritesList">
+                      My Friends
+                    </Link>
+                  </li>
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/settings">
+                      Settings
+                    </Link>
+                  </li>
+                </ul>
+              </li>
+            </ul>
 
-				<div
-					className="offcanvas offcanvas-end"
-					tabIndex="-1"
-					id="offcanvasNavbar"
-					aria-labelledby="offcanvasNavbarLabel"
-				>
-					<div className="offcanvas-header">
-						<h5 className="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
-						<button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-					</div>
-
-					<div className="offcanvas-body">
-						<ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
-							<li className="nav-item">
-								<Link className="nav-link active" to="/">Home</Link>
-							</li>
-							<li className="nav-item">
-								<Link className="nav-link" to={`/profile/${userID}`}>My Profile</Link>
-							</li>
-							<li className="nav-item dropdown">
-								<a
-									className="nav-link dropdown-toggle"
-									href="#"
-									role="button"
-									data-bs-toggle="dropdown"
-									aria-expanded="false"
-								>
-									Navigate
-								</a>
-								<ul className="dropdown-menu">
-									<li><Link className="dropdown-item" to="/goals">My Goals</Link></li>
-									<li><Link className="dropdown-item" to={`/eventlist/${userID}`}>My Events</Link></li>
-									<li><Link className="dropdown-item" to="/favoritesList">My Friends</Link></li>
-									<li>
-										<hr className="dropdown-divider" />
-									</li>
-									<li><Link className="dropdown-item" to="/settings">Settings</Link></li>
-								</ul>
-							</li>
-						</ul>
-						<form className="d-flex mt-3" role="search">
-							<input
-								className="form-control me-2"
-								type="search"
-								placeholder="Search"
-								aria-label="Search"
-								value={searchbar}
-								onChange={(event) => setSearchbar(event.target.value)}
-							/>
-							<Link to={"/search"} onClick={() => setFromNavbar(true)}><button className="btn btn-outline-success">Search</button></Link>
-						</form>
-					</div>
-				</div>
-			</div>
-		</nav>
-	);
+            {/* Search form */}
+            <form className="d-flex ms-3" role="search">
+              <input
+                className="form-control rounded-pill me-2"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                value={searchbar}
+                onChange={(event) => setSearchbar(event.target.value)}
+              />
+              <Link to="/search" onClick={() => setFromNavbar(true)}>
+                <button
+                  type="button"
+                  className="btn rounded-pill px-4"
+                  style={{ backgroundColor: "#7FC1E0", color: "white" }}
+                >
+                  Search
+                </button>
+              </Link>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
 };
