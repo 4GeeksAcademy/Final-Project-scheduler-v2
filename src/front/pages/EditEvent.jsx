@@ -83,7 +83,6 @@ export const EditEvent = () => {
                 "visibility": eventVisibility,
                 "timer": timerUsed ? timer : { "hours": 0, "minutes": 0, "seconds": 0 }
             }
-            console.log("sentData: ", sentData)
             const response = await fetch(`${API_URL}api/edit/event/${eventId}`, {
                 method: "PUT",
                 headers: {
