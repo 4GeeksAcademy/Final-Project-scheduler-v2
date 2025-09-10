@@ -1,3 +1,4 @@
+// src/pages/Profile-page.jsx
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import defaultProfilePhoto from "../assets/img/profile-photo.jpg";
@@ -11,24 +12,27 @@ const getCurrentWeek = (weekOffset = 0) => {
   startOfWeek.setDate(today.getDate() - today.getDay() + weekOffset * 7);
   const week = [];
   for (let i = 0; i < 7; i++) {
-    const day = new Date(startOfWeek);
-    day.setDate(startOfWeek.getDate() + i);
-    week.push(day);
+    const d = new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate() + i);
+    week.push(d);
   }
   return week;
 };
 
 const ProfilePage = () => {
-  const { userID, setUserID } = useContext(NavbarContext); // ⬅️ add setUserID
+  const { userID, setUserID } = useContext(NavbarContext);
   const { userId } = useParams();
   const navigate = useNavigate();
+
+  // Treat -1 / null / undefined as “no user”
+  const safeUserId =
+    userId && !["-1", "null", "undefined"].includes(String(userId)) ? userId : null;
 
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [profilePhoto, setProfilePhoto] = useState(defaultProfilePhoto);
   const [username, setUsername] = useState("");
-
   const [goals, setGoals] = useState([]);
 
   const [holidays, setHolidays] = useState([]);
@@ -38,7 +42,7 @@ const ProfilePage = () => {
 
   const week = getCurrentWeek(weekOffset);
   const isAuthenticated = !!localStorage.getItem("token");
-  const isOwner = isAuthenticated && String(userID) === String(userId);
+  const isOwner = isAuthenticated && safeUserId && String(userID) === String(safeUserId);
 
   useEffect(() => {
     const newYear = week[0].getFullYear();
@@ -49,11 +53,9 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchHolidays = async () => {
       setLoading(true);
-      const apiKey = "3CRFaZmG1Jgk2FfIxOQBEfPhznPP7ckL";
-      const country = "US";
       try {
         const res = await fetch(
-          `https://calendarific.com/api/v2/holidays?&api_key=${apiKey}&country=${country}&year=${year}`
+          `https://calendarific.com/api/v2/holidays?&api_key=3CRFaZmG1Jgk2FfIxOQBEfPhznPP7ckL&country=US&year=${year}`
         );
         const data = await res.json();
         setHolidays(data.response?.holidays || []);
@@ -66,11 +68,11 @@ const ProfilePage = () => {
   }, [year]);
 
   useEffect(() => {
-    if (!userId) return;
-    const fetchUser = async () => {
+    if (!safeUserId) return;              // ⬅️ skip when invalid
+    (async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`${API_URL}/api/users/${userId}`, {
+        const res = await fetch(`${API_URL}/api/users/${safeUserId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!res.ok) throw new Error("Failed to fetch user");
@@ -83,16 +85,15 @@ const ProfilePage = () => {
       } catch (err) {
         console.error(err);
       }
-    };
-    fetchUser();
-  }, [userId]);
+    })();
+  }, [safeUserId]);
 
   useEffect(() => {
-    if (!userId) return;
-    const fetchGoals = async () => {
+    if (!safeUserId) return;              // ⬅️ skip when invalid
+    (async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`${API_URL}/api/profile/goals/${userId}`, {
+        const res = await fetch(`${API_URL}/api/profile/goals/${safeUserId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!res.ok) throw new Error("Failed to fetch goals");
@@ -101,16 +102,13 @@ const ProfilePage = () => {
       } catch (err) {
         console.error(err);
       }
-    };
-    fetchGoals();
-  }, [userId]);
+    })();
+  }, [safeUserId]);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("username");
-
-    // ⬇️ Clear context + page state so nothing lingers
     setUserID?.(null);
     setName("");
     setLastName("");
@@ -118,7 +116,6 @@ const ProfilePage = () => {
     setUsername("");
     setProfilePhoto(defaultProfilePhoto);
     setGoals([]);
-
     navigate("/", { replace: true });
   };
 
@@ -163,58 +160,71 @@ const ProfilePage = () => {
           <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-6">
             <div className="text-center">
               <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 tracking-tight mb-4">
-                {name ? `${name} ${lastName}` : "Profile"}
+                {safeUserId && name ? `${name} ${lastName}` : "Profile"}
               </h1>
             </div>
 
             <div className="flex flex-col items-center">
               <div className="h-40 w-40 md:h-48 md:w-48 rounded-full overflow-hidden shadow-sm">
-                <img
-                  src={profilePhoto}
-                  alt="Profile"
-                  className="h-full w-full object-cover"
-                />
+                <img src={profilePhoto} alt="Profile" className="h-full w-full object-cover" />
               </div>
 
-              <div className="mt-5 w-full text-center space-y-2">
-                {email && (
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Email:</span> {email}
+              {!safeUserId ? (
+                <div className="mt-6 text-center">
+                  <p className="text-gray-600 mb-3">
+                    No user selected. Sign in to view your profile.
                   </p>
-                )}
-                {username && (
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Username:</span> {username}
-                  </p>
-                )}
-              </div>
+                  {!isAuthenticated && (
+                    <Link to="/">
+                      <button className="bg-[#7FC1E0] text-white font-semibold py-2 px-4 rounded-full hover:bg-[#5fa9cb] transition-colors duration-200">
+                        Sign In
+                      </button>
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="mt-5 w-full text-center space-y-2">
+                    {email && (
+                      <p className="text-gray-700">
+                        <span className="font-semibold">Email:</span> {email}
+                      </p>
+                    )}
+                    {username && (
+                      <p className="text-gray-700">
+                        <span className="font-semibold">Username:</span> {username}
+                      </p>
+                    )}
+                  </div>
 
-              <div className="mt-6 flex flex-wrap gap-3 justify-center">
-                <Link to={`/listview/${userId}`}>
-                  <button className="border border-[#7FC1E0] text-[#28779a] font-semibold py-2 px-4 rounded-full hover:bg-[#e9f5fb] transition-colors duration-200">
-                    {`View ${name ? name + " " + lastName : "user"}'s Events`}
-                  </button>
-                </Link>
+                  <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                    <Link to={`/listview/${safeUserId}`}>
+                      <button className="border border-[#7FC1E0] text-[#28779a] font-semibold py-2 px-4 rounded-full hover:bg-[#e9f5fb] transition-colors duration-200">
+                        {`View ${name ? name + " " + lastName : "user"}'s Events`}
+                      </button>
+                    </Link>
 
-                {isOwner ? (
-                  <button
-                    onClick={handleSignOut}
-                    className="bg-red-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-red-600 transition-colors duration-200"
-                    title="Sign out"
-                  >
-                    Sign Out
-                  </button>
-                ) : !isAuthenticated ? (
-                  <Link to="/">
-                    <button
-                      className="bg-[#7FC1E0] text-white font-semibold py-2 px-4 rounded-full hover:bg-[#5fa9cb] transition-colors duration-200"
-                      title="Sign in"
-                    >
-                      Sign In
-                    </button>
-                  </Link>
-                ) : null}
-              </div>
+                    {isOwner ? (
+                      <button
+                        onClick={handleSignOut}
+                        className="bg-red-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-red-600 transition-colors duration-200"
+                        title="Sign out"
+                      >
+                        Sign Out
+                      </button>
+                    ) : !isAuthenticated ? (
+                      <Link to="/">
+                        <button
+                          className="bg-[#7FC1E0] text-white font-semibold py-2 px-4 rounded-full hover:bg-[#5fa9cb] transition-colors duration-200"
+                          title="Sign in"
+                        >
+                          Sign In
+                        </button>
+                      </Link>
+                    ) : null}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -232,17 +242,18 @@ const ProfilePage = () => {
               )}
             </div>
 
-            {goals.length === 0 ? (
+            {!safeUserId ? (
+              <div className="text-center text-gray-400 p-8">
+                <p>No goals to show.</p>
+              </div>
+            ) : goals.length === 0 ? (
               <div className="text-center text-gray-400 p-8">
                 <p>No goals yet.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {goals.map((goal) => {
-                  const percent = Math.min(
-                    100,
-                    (goal.completions / goal.target) * 100
-                  );
+                  const percent = Math.min(100, (goal.completions / goal.target) * 100);
                   const complete = percent >= 100;
                   return (
                     <div key={goal.id} className="space-y-2">
@@ -308,13 +319,9 @@ const ProfilePage = () => {
               return (
                 <div
                   key={iso}
-                  className={`rounded-xl p-3 text-center shadow-sm ${
-                    isHoliday ? "bg-green-50" : "bg-gray-50"
-                  }`}
+                  className={`rounded-xl p-3 text-center shadow-sm ${isHoliday ? "bg-green-50" : "bg-gray-50"}`}
                 >
-                  <div className="text-lg font-semibold text-gray-800">
-                    {day.getDate()}
-                  </div>
+                  <div className="text-lg font-semibold text-gray-800">{day.getDate()}</div>
                   <div className="text-sm text-gray-500">
                     {day.toLocaleString("default", { weekday: "short" })}
                   </div>
@@ -334,6 +341,7 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
 
 
 
