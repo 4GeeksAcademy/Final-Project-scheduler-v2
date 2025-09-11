@@ -94,7 +94,7 @@ export const CreateEvent = () => {
         }
 
     }
-    let weeklyCheckboxes = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday"].map((days, index) => (
+    let weeklyCheckboxes = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((days, index) => (
         <div className="mb-3 mx-2 form-check" key={index}>
             <input type="checkbox" className="form-check-input border-dark border-opacity-50" id={days} onChange={changeWeekdays} />
             <label className="form-check-label ">{days}</label>

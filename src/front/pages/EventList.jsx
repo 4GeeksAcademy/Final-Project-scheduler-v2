@@ -19,7 +19,7 @@ export default function EventList() {
   }
 
   async function deleteEvent(event_id) {
-    const response = await fetch(`${API_URL}api/delete/event/${event_id}`, {
+    const response = await fetch(`${API_URL}api/delete/event/${event_id}/${userId}`, {
       method: "DELETE",
     });
     const data = await response.json();

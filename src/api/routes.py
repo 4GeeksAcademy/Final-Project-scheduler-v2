@@ -94,13 +94,13 @@ def post_event_route(event_id):
 # --- List all users (consider adding pagination later) ---
 
 
-@api.route('/delete/event/<int:event_id>', methods=['DELETE'])
-def delete_event_create_route(event_id):
+@api.route('/delete/event/<int:event_id>/<int:user_id>', methods=['DELETE'])
+def delete_event_create_route(event_id, user_id):
     event = Events.query.get(event_id)
 
     db.session.delete(event)
     db.session.commit()
-    events = Events.query.order_by(Events.id.desc()).all()
+    events = Events.query.filter(Events.host_id == user_id).all()
     return jsonify({"remaining_events": [e.serialize() for e in events]}), 200
 
 
