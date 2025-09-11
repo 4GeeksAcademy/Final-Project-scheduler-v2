@@ -114,9 +114,9 @@ export const CreateEvent = () => {
                 <div className="py-3"><span></span></div>
                 <div className="card shadow-lg border-0" style={{ borderRadius: "1rem", overflow: "hidden" }}>
                     <div className="row d-flex justify-content-center p-5">
-                        <div className="mt-5 col-4">
-                            <h1 className="fs-1 mb-3">Create Event:</h1>
-                            <div className="mb-3">
+                        <div className="mt-5 col-5">
+                            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 tracking-tight mb-2">Create Event:</h1>
+                            <div className="mb-3 mt-4">
                                 <label className="form-label">Event Name:</label>
                                 <input type="text" className="form-control w-50 border-dark border-opacity-50" id="name" value={eventData.name} onChange={changeEventData} />
                             </div>
