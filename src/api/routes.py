@@ -343,7 +343,8 @@ def get_goals():
     current_user_id = int(get_jwt_identity())  # <-- cast to int
 
     # Query the database for all goals belonging to this user
-    user_goals = Goal.query.filter_by(user_id=current_user_id).all()
+    user_goals = Goal.query.filter_by(
+        user_id=current_user_id).order_by(Goal.text.asc()).all()
 
     # Serialize the goals to a list of dictionaries and return them
     return jsonify({"goals": [goal.serialize() for goal in user_goals]}), 200
